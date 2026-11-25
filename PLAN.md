@@ -286,7 +286,7 @@ Run this setup once before launching Tasks A, B, and C in parallel:
 
 ## 4. Verification & Local Run Commands
 
-Run from `/Users/shivamsharma/Documents/04_Coding Projects/01_Bots/01_Main`:
+Run from the project root directory:
 
 ```bash
 # 1. Install dependencies (during Phase 0)

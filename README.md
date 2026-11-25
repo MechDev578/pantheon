@@ -31,7 +31,6 @@ Packaged as a global Antigravity MCP App plugin at `~/.gemini/config/plugins/bot
 
 ### 2. Hosted Web App on Netlify (Always Online + Mac Dock)
 - **Live URL:** https://bot-mind-map-live.netlify.app
-- **Netlify Dashboard:** https://app.netlify.com/projects/bot-mind-map-live
 - **Install as a Mac Dock App:** Open the URL in **Safari** → *File → Add to Dock…* (or **Chrome** → *Install page as app*).
 
 ### 3. Standalone Offline macOS Desktop App (`.app`)
