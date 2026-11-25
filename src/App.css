@@ -8,6 +8,40 @@
   color: var(--text-primary);
 }
 
+.app-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 16px;
+  background: rgba(248, 113, 113, 0.14);
+  border-bottom: 1px solid rgba(248, 113, 113, 0.4);
+  color: #fecaca;
+  font-size: 12.5px;
+  flex-shrink: 0;
+  z-index: 22;
+}
+
+.app-error-banner span {
+  flex: 1;
+}
+
+.app-error-close {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #fecaca;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.app-error-close:hover {
+  background: rgba(248, 113, 113, 0.22);
+}
+
 .app-workspace {
   flex: 1;
   display: flex;

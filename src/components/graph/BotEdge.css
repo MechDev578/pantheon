@@ -13,6 +13,13 @@
   filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.35));
 }
 
+.react-flow__edge-path.bot-edge-path--waiting {
+  stroke: var(--status-waiting);
+  stroke-width: 1.9;
+  stroke-dasharray: 5 5;
+  animation: bot-edge-flow 1.4s linear infinite;
+}
+
 .react-flow__edge-path.bot-edge-path--idle {
   stroke: #475569;
   stroke-dasharray: 3 3;
@@ -20,8 +27,13 @@
 }
 
 .react-flow__edge-path.bot-edge-path--done {
-  stroke: rgba(16, 185, 129, 0.42);
+  stroke: rgba(16, 185, 129, 0.45);
   opacity: 0.85;
+}
+
+.react-flow__edge-path.bot-edge-path--error {
+  stroke: rgba(248, 113, 113, 0.6);
+  opacity: 0.9;
 }
 
 @keyframes bot-edge-flow {

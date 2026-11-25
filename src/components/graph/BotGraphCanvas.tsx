@@ -28,8 +28,10 @@ const edgeTypes = {
 
 const MINIMAP_STATUS_COLOR: Record<BotStatus, string> = {
   running: '#22d3ee',
+  waiting: '#a78bfa',
   idle: '#f59e0b',
   done: '#10b981',
+  error: '#f87171',
 };
 
 function BotGraphCanvasInner({
@@ -45,6 +47,7 @@ function BotGraphCanvasInner({
 
   const pinnedPositionsRef = useRef<Record<string, XYPosition>>({});
   const prevLayoutVersionRef = useRef<number>(layoutVersion);
+  const prevBotCountRef = useRef<number>(0);
 
   useEffect(() => {
     const layoutChanged = prevLayoutVersionRef.current !== layoutVersion;
@@ -53,7 +56,6 @@ function BotGraphCanvasInner({
       prevLayoutVersionRef.current = layoutVersion;
     }
 
-    // Prune stale pinned entries that no longer exist in current bots map
     const existingPins = pinnedPositionsRef.current;
     for (const pinnedId of Object.keys(existingPins)) {
       if (!bots[pinnedId]) {
@@ -99,9 +101,12 @@ function BotGraphCanvasInner({
     setNodes(nextNodes);
     setEdges(nextEdges);
 
-    if (layoutChanged) {
+    const countGrew = botList.length !== prevBotCountRef.current;
+    prevBotCountRef.current = botList.length;
+
+    if (layoutChanged || (countGrew && Object.keys(existingPins).length === 0)) {
       const frameId = requestAnimationFrame(() => {
-        void fitView({ padding: 0.2, duration: 350 });
+        void fitView({ padding: 0.22, duration: 350 });
       });
       return () => cancelAnimationFrame(frameId);
     }
@@ -109,12 +114,9 @@ function BotGraphCanvasInner({
     return undefined;
   }, [bots, rootId, selectedBotId, layoutVersion, setNodes, setEdges, fitView]);
 
-  const handleNodeDragStop: OnNodeDrag<BotFlowNode> = useCallback(
-    (_event, node) => {
-      pinnedPositionsRef.current[node.id] = { ...node.position };
-    },
-    [],
-  );
+  const handleNodeDragStop: OnNodeDrag<BotFlowNode> = useCallback((_event, node) => {
+    pinnedPositionsRef.current[node.id] = { ...node.position };
+  }, []);
 
   const handleNodeClick = useCallback(
     (_event: MouseEvent, node: BotFlowNode) => {
@@ -144,19 +146,14 @@ function BotGraphCanvasInner({
         onNodeClick={handleNodeClick}
         onPaneClick={handlePaneClick}
         fitView
-        fitViewOptions={{ padding: 0.2 }}
-        minZoom={0.2}
+        fitViewOptions={{ padding: 0.22 }}
+        minZoom={0.18}
         maxZoom={1.75}
         nodesConnectable={false}
         elementsSelectable
         proOptions={{ hideAttribution: true }}
       >
-        <Background
-          variant={BackgroundVariant.Dots}
-          gap={20}
-          size={1}
-          color="#1e293b"
-        />
+        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#1e293b" />
         <Controls showInteractive={false} />
         <MiniMap
           pannable

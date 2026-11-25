@@ -1,43 +1,52 @@
-export type BotStatus = 'running' | 'idle' | 'done';
+export type {
+  AIProvider,
+  BotEntity,
+  BotLogEntry,
+  BotRole,
+  BotStatus,
+  ClarifyingQuestion,
+  ContextMode,
+  EngineRuntime,
+  LogLevel,
+  MissionConfig,
+  MissionState,
+  MissionStatus,
+  MissionStreamEvent,
+  MissionSummary,
+  ResearchDepth,
+  ScrapedSource,
+  SearchProvider,
+  ServerCapabilities,
+} from '../../engine/types';
 
-export type LogLevel = 'info' | 'warn' | 'success' | 'debug';
-
-export type BotRole =
-  | 'Orchestrator'
-  | 'Planner'
-  | 'Researcher'
-  | 'Architect'
-  | 'Coder'
-  | 'Reviewer'
-  | 'Tester'
-  | 'Synthesizer';
-
-export interface BotLogEntry {
-  id: string;
-  timestamp: string; // ISO 8601 string
-  level: LogLevel;
-  message: string;
-}
-
-export interface BotEntity {
-  id: string;
-  name: string;
-  role: BotRole;
-  status: BotStatus;
-  currentTask: string;
-  parentId: string | null;
-  childIds: string[];
-  depth: number;
-  createdAt: string; // ISO 8601 string
-  updatedAt: string; // ISO 8601 string
-  logs: BotLogEntry[];
-}
+import type {
+  AIProvider,
+  BotEntity,
+  BotRole,
+  ContextMode,
+  EngineRuntime,
+  ResearchDepth,
+  SearchProvider,
+} from '../../engine/types';
 
 export interface SimulationStats {
   total: number;
   running: number;
+  waiting: number;
   idle: number;
   done: number;
+  error: number;
+  sourcesScraped: number;
+}
+
+export interface PantheonSettings {
+  provider: AIProvider;
+  model: string;
+  apiKeys: Record<AIProvider, string>;
+  searchProvider: SearchProvider;
+  searchApiKey: string;
+  defaultContextMode: ContextMode;
+  defaultDepth: ResearchDepth;
 }
 
 export interface BotSimulationState {
@@ -49,20 +58,6 @@ export interface BotSimulationState {
   layoutVersion: number;
 }
 
-export interface BotSimulationActions {
-  toggleSimulation: () => void;
-  selectBot: (botId: string | null) => void;
-  spawnManualBot: (parentId?: string) => void;
-  resetSimulation: () => void;
-  triggerAutoLayout: () => void;
-}
-
-export type UseBotSimulationResult = BotSimulationState &
-  BotSimulationActions & {
-    stats: SimulationStats;
-    selectedBot: BotEntity | null;
-  };
-
 export interface BotGraphCanvasProps {
   bots: Record<string, BotEntity>;
   rootId: string;
@@ -72,19 +67,29 @@ export interface BotGraphCanvasProps {
 }
 
 export interface HeaderToolbarProps {
-  isSimulating: boolean;
+  runtimeMode: EngineRuntime;
+  detectedBackend: 'local' | 'cloud' | null;
+  isBusy: boolean;
+  isDemoSimulating: boolean;
+  hasReport: boolean;
+  hasKeyReady: boolean;
   stats: SimulationStats;
-  selectedBotName: string | null;
-  onToggleSimulation: () => void;
-  onSpawnBot: () => void;
-  onReset: () => void;
+  onSwitchRuntime: (mode: EngineRuntime) => void;
+  onToggleDemoSimulation: () => void;
+  onAbortMission: () => void;
+  onOpenReport: () => void;
+  onOpenSettings: () => void;
   onAutoLayout: () => void;
+  onResetDemo: () => void;
 }
 
 export interface LogInspectorPanelProps {
   bot: BotEntity | null;
   parentBot: BotEntity | null;
   childBots: BotEntity[];
+  canSpawnLiveChild: boolean;
+  hasMissionReport: boolean;
   onSelectBot: (botId: string | null) => void;
-  onSpawnChild: (parentId: string) => void;
+  onSpawnChild: (parentId: string, role?: BotRole, task?: string) => void;
+  onOpenReport: () => void;
 }

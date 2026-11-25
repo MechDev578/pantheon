@@ -1,0 +1,254 @@
+.settings-modal {
+  width: 100%;
+  max-width: 620px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+}
+
+.settings-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(26, 34, 52, 0.55);
+}
+
+.settings-title-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.settings-icon {
+  color: var(--status-running);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.settings-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.settings-subtitle {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.settings-body {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+}
+
+.settings-status-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 13px;
+  border-radius: 10px;
+  background: rgba(34, 211, 238, 0.08);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  color: #67e8f9;
+}
+
+.status-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12px;
+}
+
+.status-card-text strong {
+  color: var(--text-primary);
+}
+
+.status-card-text span {
+  color: var(--text-secondary);
+  font-size: 11.5px;
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.settings-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.settings-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+.env-detected-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #34d399;
+}
+
+.provider-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.provider-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.provider-card:hover {
+  border-color: #3b4b6b;
+}
+
+.provider-card.is-selected {
+  border-color: var(--border-active);
+  background: rgba(34, 211, 238, 0.12);
+}
+
+.provider-name {
+  font-size: 12.5px;
+  font-weight: 650;
+}
+
+.provider-badge {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+.provider-badge.is-ready {
+  color: #34d399;
+}
+
+.settings-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.settings-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 11px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-size: 12.5px;
+  outline: none;
+}
+
+.settings-input:focus {
+  border-color: var(--border-active);
+}
+
+.key-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.key-input-wrap .settings-input {
+  padding-right: 36px;
+}
+
+.key-eye-btn {
+  position: absolute;
+  right: 6px;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.key-eye-btn:hover {
+  color: var(--text-primary);
+}
+
+.settings-divider {
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+.settings-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 18px;
+  border-top: 1px solid var(--border-subtle);
+  background: rgba(11, 15, 23, 0.65);
+}
+
+.settings-privacy-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.settings-done-btn {
+  height: 34px;
+  padding: 0 18px;
+  border-radius: 8px;
+  border: 1px solid rgba(34, 211, 238, 0.5);
+  background: rgba(34, 211, 238, 0.18);
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.settings-done-btn:hover {
+  background: rgba(34, 211, 238, 0.28);
+}
+
+@media (max-width: 600px) {
+  .provider-grid,
+  .settings-row {
+    grid-template-columns: 1fr;
+  }
+}

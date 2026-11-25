@@ -1,78 +1,89 @@
+import {
+  pickMythologicalIdentity,
+  PRIMARY_DEITIES,
+} from '../../engine/pantheonRoster';
 import type {
   BotEntity,
   BotLogEntry,
   BotRole,
   BotSimulationState,
   LogLevel,
+  ScrapedSource,
 } from '../types/bot';
 
-const AUTO_MAX_BOTS = 22;
+const AUTO_MAX_BOTS = 20;
 const AUTO_MAX_DEPTH = 3;
-const MANUAL_MAX_BOTS = 40;
+const MANUAL_MAX_BOTS = 36;
 const MANUAL_MAX_DEPTH = 4;
 const MAX_LOGS_PER_BOT = 120;
 const MAX_AUTO_CHILDREN_PER_PARENT = 4;
 
 const CHILD_ROLE_MAP: Record<BotRole, readonly BotRole[]> = {
-  Orchestrator: ['Planner', 'Researcher', 'Architect'],
-  Planner: ['Researcher', 'Architect'],
-  Researcher: ['Synthesizer', 'Planner'],
+  Orchestrator: ['Planner', 'Researcher', 'Scraper', 'Architect'],
+  Planner: ['Researcher', 'Scraper', 'Architect'],
+  Researcher: ['Scraper', 'Synthesizer', 'Reviewer'],
+  Scraper: ['Scraper', 'Reviewer', 'Synthesizer'],
   Architect: ['Coder', 'Reviewer'],
   Coder: ['Tester', 'Reviewer'],
-  Reviewer: ['Coder', 'Tester'],
+  Reviewer: ['Scraper', 'Synthesizer'],
   Tester: ['Synthesizer', 'Reviewer'],
   Synthesizer: ['Reviewer'],
 };
 
 const ROLE_TASK_POOLS: Record<BotRole, readonly string[]> = {
   Orchestrator: [
-    'Coordinate active sub-agent execution graph and resolve dependency gates',
-    'Rebalance task queue priorities across active planning and coding branches',
-    'Monitor child agent telemetry and aggregate completion milestones',
-    'Dispatch next-wave work packages to idle specialist branches',
+    'Coordinate Olympian swarm across multi-site web discovery & deep scraping',
+    'Rebalance crawler priorities and monitor child bot source extraction',
+    'Aggregate verified pricing, policies, and deep site findings from sub-agents',
+    'Dispatch follow-up Olympians to close remaining research gaps',
   ],
   Planner: [
-    'Decompose system requirements into parallelizable execution milestones',
-    'Validate critical-path dependencies across architectural modules',
-    'Sequence handoff contracts and acceptance criteria for downstream bots',
-    'Refine scope boundaries and fallback strategies for edge cases',
+    'Decompose user objective into parallel website scouting & comparison tracks',
+    'Build evaluation rubric covering pricing, hidden fees, location, and ratings',
+    'Sequence dependency gates for deep crawlers and fact verifiers',
   ],
   Researcher: [
-    'Scan repository conventions and index existing type interfaces',
-    'Benchmark streaming graph layout performance under high node density',
-    'Cross-reference API compatibility constraints and state invariants',
-    'Gather telemetry patterns for real-time observability dashboards',
+    'Hunt official websites, booking portals, and independent review threads',
+    'Query multiple search angles to surface primary listings and direct rates',
+    'Cross-check availability, neighborhood reviews, and hidden policies',
+  ],
+  Scraper: [
+    'Deep-crawl target website sub-pages (/rooms, /pricing, /amenities, /faq)',
+    'Extract structured pricing tables, cancellation rules, and contact details',
+    'Follow internal links to uncover unlisted fees and direct-booking perks',
   ],
   Architect: [
-    'Design decoupled state-transition contracts and immutable graph updates',
-    'Specify hierarchical tree layout geometry and collision-free spacing',
-    'Define edge animation triggers and node lifecycle state machines',
-    'Audit module boundaries to prevent circular dependencies',
+    'Structure multi-day itinerary and logistics matrix from verified sources',
+    'Design comparison schema mapping cost, quality, and distance trade-offs',
   ],
   Coder: [
-    'Implement deterministic simulation tick reducer and log buffer capping',
-    'Build reactive hook bindings with memoized topology statistics',
-    'Wire status transition guards and parent-child delegation handlers',
-    'Optimize immutable state cloning for high-frequency tick updates',
+    'Normalize scraped HTML tables into structured JSON comparison objects',
+    'Build reusable extraction selectors for dynamic listing pages',
   ],
   Reviewer: [
-    'Inspect TypeScript strict-mode compliance and union exhaustiveness',
-    'Verify immutability of simulation state across concurrent ticks',
-    'Review parent-child termination ordering and orphan prevention',
-    'Check log ring-buffer bounds and timestamp monotonicity',
+    'Cross-verify scraped prices against official booking and policy pages',
+    'Audit sources for stale listings, hidden taxes, or contradictory reviews',
   ],
   Tester: [
-    'Run stress simulation up to 22 auto-spawned agents across 3 depth levels',
-    'Verify manual child spawning under selected, idle, and done parents',
-    'Validate pause, resume, auto-layout, and reset state transitions',
-    'Assert zero duplicate bot IDs and consistent parent/child references',
+    'Validate budget constraints, transit times, and booking edge cases',
+    'Verify every recommendation has at least two independent live URLs',
   ],
   Synthesizer: [
-    'Consolidate research findings into actionable implementation briefs',
-    'Merge verification telemetry and summarize subsystem health',
-    'Compile execution trace highlights for root orchestrator sign-off',
-    'Distill cross-branch anomalies into structured diagnostic notes',
+    'Fuse all Olympian dossiers into an executive comparison report with citations',
+    'Compile ranked shortlist with clickable official links and transparent assumptions',
   ],
+};
+
+const ROLE_ACTIVE_TOOLS: Record<BotRole, readonly string[]> = {
+  Orchestrator: ['Coordinating swarm', 'Monitoring Olympians', 'Delegating wave'],
+  Planner: ['Structuring rubric', 'Mapping research tracks'],
+  Researcher: ['Searching web', 'Ranking primary URLs', 'Discovering leads'],
+  Scraper: ['Deep crawling site', 'Extracting tables', 'Following sub-links'],
+  Architect: ['Designing blueprint', 'Mapping dependencies'],
+  Coder: ['Building parser', 'Normalizing schema'],
+  Reviewer: ['Fact-checking claims', 'Verifying prices'],
+  Tester: ['Checking constraints', 'Auditing citations'],
+  Synthesizer: ['Composing report', 'Formatting tables'],
 };
 
 const ROLE_LOG_MESSAGES: Record<
@@ -80,92 +91,81 @@ const ROLE_LOG_MESSAGES: Record<
   ReadonlyArray<{ level: LogLevel; message: string }>
 > = {
   Orchestrator: [
-    { level: 'info', message: 'Evaluated active DAG branches; latency nominal.' },
-    { level: 'debug', message: 'Synchronized shared context snapshot across child workers.' },
-    { level: 'success', message: 'Verified upstream milestone checkpoint reached.' },
-    { level: 'warn', message: 'Detected slight queue skew; rebalancing task weights.' },
+    { level: 'info', message: 'Evaluated active Olympian branches; parallel throughput nominal.' },
+    { level: 'thought', message: 'Checking if additional deep crawlers are needed on top domains.' },
+    { level: 'success', message: 'Upstream discovery milestone confirmed across active scouts.' },
+    { level: 'warn', message: 'Detected slight rate limit on one host; redistributing crawl depth.' },
   ],
   Planner: [
-    { level: 'info', message: 'Updated execution dependency matrix for current sprint.' },
-    { level: 'debug', message: 'Estimated branch depth and token budget allocation.' },
-    { level: 'success', message: 'Locked interface contract for parallel subtasks.' },
-    { level: 'warn', message: 'Flagged potential bottleneck in downstream review stage.' },
+    { level: 'thought', message: 'Refined comparison dimensions: total cost, proximity, cancellation terms.' },
+    { level: 'info', message: 'Published parallel research tracks for Artemis and Hermes.' },
+    { level: 'success', message: 'Locked evaluation checklist for downstream verifiers.' },
   ],
   Researcher: [
-    { level: 'info', message: 'Indexed 14 module references and cross-checked signatures.' },
-    { level: 'debug', message: 'Sampled throughput metrics over sliding 10-tick window.' },
-    { level: 'success', message: 'Confirmed zero breaking changes in target dependencies.' },
-    { level: 'warn', message: 'Partial cache miss on historical trace lookup; retrying.' },
+    { level: 'tool', message: 'Searching web: official direct booking pages & verified guest reviews' },
+    { level: 'info', message: 'Surfaced 9 high-authority candidate URLs for deep crawling.' },
+    { level: 'success', message: 'Filtered out aggregators; prioritized primary source domains.' },
+  ],
+  Scraper: [
+    { level: 'tool', message: 'Deep crawling /pricing, /amenities, and /policies sub-pages' },
+    { level: 'info', message: 'Extracted structured rate table (1,840 words, 24 internal links).' },
+    { level: 'success', message: 'Captured direct contact info and cancellation policy details.' },
+    { level: 'warn', message: 'Encountered cookie modal; parsed semantic main content directly.' },
   ],
   Architect: [
-    { level: 'info', message: 'Validated component isolation and unidirectional data flow.' },
-    { level: 'debug', message: 'Checked subtree spacing invariants for nested children.' },
-    { level: 'success', message: 'Approved state machine transition table for workers.' },
-    { level: 'warn', message: 'Depth threshold approaching limit; constraining fan-out.' },
+    { level: 'thought', message: 'Organizing findings into weighted decision matrix and day-by-day plan.' },
+    { level: 'info', message: 'Mapped transit durations and geographic clusters.' },
   ],
   Coder: [
-    { level: 'info', message: 'Patched pure state reducer with immutable log appends.' },
-    { level: 'debug', message: 'Verified strict TypeScript narrowing on nullable parentId.' },
-    { level: 'success', message: 'Compiled worker module cleanly with zero warnings.' },
-    { level: 'warn', message: 'Retrying lock-free batch update after concurrent tick.' },
+    { level: 'tool', message: 'Parsing structured HTML specification tables into clean Markdown.' },
+    { level: 'success', message: 'Normalized currency units and fee breakdowns cleanly.' },
   ],
   Reviewer: [
-    { level: 'info', message: 'Audited diff for side effects and accidental array mutations.' },
-    { level: 'debug', message: 'Traced edge-case handling when selectedBotId is null.' },
-    { level: 'success', message: 'Static type and invariant checks passed.' },
-    { level: 'warn', message: 'Requested clearer boundary check on maximum tree depth.' },
+    { level: 'info', message: 'Cross-checked direct website rate against third-party listing.' },
+    { level: 'warn', message: 'Flagged local city tax not included in headline nightly rate.' },
+    { level: 'success', message: 'All 6 cited URLs verified active and consistent.' },
   ],
   Tester: [
-    { level: 'info', message: 'Executed randomized tick sequence over 50 iterations.' },
-    { level: 'debug', message: 'Asserted bidirectional parentId/childIds symmetry.' },
-    { level: 'success', message: 'All lifecycle transition assertions passed.' },
-    { level: 'warn', message: 'High fan-out detected on branch; monitoring layout bounds.' },
+    { level: 'info', message: 'Validated total budget and schedule feasibility across top picks.' },
+    { level: 'success', message: 'Zero broken links or constraint violations detected.' },
   ],
   Synthesizer: [
-    { level: 'info', message: 'Aggregated telemetry summaries from sibling research bots.' },
-    { level: 'debug', message: 'Deduplicated overlapping findings across depth levels.' },
-    { level: 'success', message: 'Published concise status digest to parent orchestrator.' },
-    { level: 'warn', message: 'Waiting on one pending trace before finalizing report.' },
+    { level: 'thought', message: 'Merging scraped dossiers from Hermes, Iris, and Artemis.' },
+    { level: 'success', message: 'Updated executive report with ranked comparison table & citations.' },
   ],
 };
 
-const CODENAME_POOL: readonly string[] = [
-  'Kestrel',
-  'Pulse',
-  'Cipher',
-  'Aegis',
-  'Lyra',
-  'Helix',
-  'Orion',
-  'Echo',
-  'Beacon',
-  'Nexus',
-  'Strata',
-  'Vertex',
-  'Quill',
-  'Delta',
-  'Spark',
-  'Flux',
-  'Prism',
-  'Talon',
-  'Nimbus',
-  'Rift',
-  'Cortex',
-  'Sable',
-  'Zephyr',
-  'Solis',
-  'Matrix',
-  'Cobalt',
-  'Signal',
-  'Drift',
-  'Torus',
-  'Vanguard',
-  'Astra',
-  'Chronos',
-  'Zenith',
-  'Relay',
-  'Kernel',
-  'Shard',
+const DEMO_SAMPLE_DOMAINS: ReadonlyArray<{ domain: string; title: string; path: string; excerpt: string }> = [
+  {
+    domain: 'visitlisboa.com',
+    title: 'Official Lisbon Neighborhood & Boutique Stay Guide',
+    path: '/en/stay/alfama-historic-quarter',
+    excerpt: 'Historic Alfama district guide covering boutique guesthouses, tram 28 access, and seasonal tourist tax details.',
+  },
+  {
+    domain: 'alma-lusa.com',
+    title: 'AlmaLusa Baixa/Chiado — Direct Rates & Policies',
+    path: '/rooms-and-rates',
+    excerpt: 'Direct booking includes flexible 48-hour cancellation, complimentary breakfast options, and walkability to Alfama.',
+  },
+  {
+    domain: 'santiagodealfama.com',
+    title: 'Santiago de Alfama Boutique Hotel — Rooms & Amenities',
+    path: '/en/amenities-and-faq',
+    excerpt: '5-star historic boutique property steps from Miradouro de Santa Luzia with direct reservation perks and airport transfer rates.',
+  },
+  {
+    domain: 'casadobarao.pt',
+    title: 'Casa do Barão — Boutique Guesthouse & Courtyard Pool',
+    path: '/policies-and-rates',
+    excerpt: '18th-century townhouse offering quiet suites, daily breakfast buffet, and transparent seasonal pricing.',
+  },
+  {
+    domain: 'memmohotels.com',
+    title: 'Memmo Alfama Hotel — Terrace & Direct Offers',
+    path: '/alfama/offers',
+    excerpt: 'Adults-oriented design hotel overlooking the Tagus River with wine bar terrace and clear cancellation windows.',
+  },
 ];
 
 let idSequence = 0;
@@ -186,20 +186,6 @@ function pickDifferentTask(role: BotRole, currentTask: string): string {
   return candidates.length > 0 ? pickRandom(candidates) : pool[0];
 }
 
-function pickAvailableName(existingBots: Record<string, BotEntity>): string {
-  const usedNames = new Set(Object.values(existingBots).map((bot) => bot.name));
-  const available = CODENAME_POOL.filter((name) => !usedNames.has(name));
-  if (available.length > 0) {
-    return pickRandom(available);
-  }
-  const base = pickRandom(CODENAME_POOL);
-  let suffix = 2;
-  while (usedNames.has(`${base}-${suffix}`)) {
-    suffix += 1;
-  }
-  return `${base}-${suffix}`;
-}
-
 function appendLog(
   logs: readonly BotLogEntry[],
   level: LogLevel,
@@ -213,10 +199,25 @@ function appendLog(
     message,
   };
   const nextLogs = [...logs, entry];
-  if (nextLogs.length > MAX_LOGS_PER_BOT) {
-    return nextLogs.slice(nextLogs.length - MAX_LOGS_PER_BOT);
-  }
-  return nextLogs;
+  return nextLogs.length > MAX_LOGS_PER_BOT
+    ? nextLogs.slice(nextLogs.length - MAX_LOGS_PER_BOT)
+    : nextLogs;
+}
+
+function makeDemoSource(nowIso: string, depth: number): ScrapedSource {
+  const sample = pickRandom(DEMO_SAMPLE_DOMAINS);
+  return {
+    id: nextUniqueId('src'),
+    url: `https://${sample.domain}${sample.path}`,
+    title: sample.title,
+    domain: sample.domain,
+    scrapedAt: nowIso,
+    wordCount: 650 + Math.floor(Math.random() * 1900),
+    excerpt: sample.excerpt,
+    linksFound: 8 + Math.floor(Math.random() * 28),
+    depth,
+    status: 'ok',
+  };
 }
 
 function cloneBot(bot: BotEntity): BotEntity {
@@ -224,13 +225,11 @@ function cloneBot(bot: BotEntity): BotEntity {
     ...bot,
     childIds: [...bot.childIds],
     logs: [...bot.logs],
+    sources: [...bot.sources],
   };
 }
 
-function hasActiveChildren(
-  bot: BotEntity,
-  bots: Record<string, BotEntity>,
-): boolean {
+function hasActiveChildren(bot: BotEntity, bots: Record<string, BotEntity>): boolean {
   return bot.childIds.some((childId) => {
     const child = bots[childId];
     return child !== undefined && child.status !== 'done';
@@ -242,12 +241,14 @@ function spawnChildUnderParent(
   parentId: string,
   nowIso: string,
   reasonLabel: 'auto' | 'manual',
+  overrideRole?: BotRole,
+  overrideTask?: string,
 ): { bots: Record<string, BotEntity>; newBot: BotEntity } {
   const parent = cloneBot(bots[parentId]);
-  const childRoles = CHILD_ROLE_MAP[parent.role];
-  const childRole = pickRandom(childRoles);
-  const childName = pickAvailableName(bots);
-  const childTask = pickRandom(ROLE_TASK_POOLS[childRole]);
+  const childRole = overrideRole ?? pickRandom(CHILD_ROLE_MAP[parent.role]);
+  const usedNames = new Set(Object.values(bots).map((b) => b.name));
+  const identity = pickMythologicalIdentity(childRole, usedNames);
+  const childTask = overrideTask?.trim() || pickRandom(ROLE_TASK_POOLS[childRole]);
   const childId = nextUniqueId('bot');
 
   const initialLogs: BotLogEntry[] = [
@@ -257,29 +258,32 @@ function spawnChildUnderParent(
       level: 'info',
       message:
         reasonLabel === 'manual'
-          ? `Manually spawned by operator under ${parent.name} (${parent.role}).`
-          : `Spawned by ${parent.name} (${parent.role}) for delegated subtask.`,
+          ? `Summoned by operator under ${parent.name} (${parent.role}).`
+          : `Deployed by ${parent.name} (${parent.role}) for parallel subtask.`,
     },
     {
       id: nextUniqueId('log'),
       timestamp: nowIso,
       level: 'debug',
-      message: `Initialized task: ${childTask}`,
+      message: `Directive: ${childTask}`,
     },
   ];
 
   const newBot: BotEntity = {
     id: childId,
-    name: childName,
+    name: identity.name,
+    epithet: identity.epithet,
     role: childRole,
     status: 'running',
     currentTask: childTask,
+    activeTool: pickRandom(ROLE_ACTIVE_TOOLS[childRole]),
     parentId: parent.id,
     childIds: [],
     depth: parent.depth + 1,
     createdAt: nowIso,
     updatedAt: nowIso,
     logs: initialLogs,
+    sources: childRole === 'Scraper' || childRole === 'Researcher' ? [makeDemoSource(nowIso, 0)] : [],
   };
 
   if (parent.status !== 'running') {
@@ -287,7 +291,7 @@ function spawnChildUnderParent(
     parent.logs = appendLog(
       parent.logs,
       'info',
-      `Reactivated to coordinate newly spawned child ${newBot.name}.`,
+      `Reactivated to coordinate newly deployed Olympian ${newBot.name}.`,
       nowIso,
     );
   }
@@ -297,7 +301,7 @@ function spawnChildUnderParent(
   parent.logs = appendLog(
     parent.logs,
     'success',
-    `Delegated subtask to ${newBot.name} (${newBot.role}): ${newBot.currentTask}`,
+    `Deployed ${newBot.name} (${newBot.role}): ${newBot.currentTask}`,
     nowIso,
   );
 
@@ -325,128 +329,147 @@ function makeStarterLogs(
 
 export function createInitialSimulationState(): BotSimulationState {
   const nowMs = Date.now();
-  const rootId = 'bot-root';
+  const rootId = 'bot-zeus';
 
   const bots: Record<string, BotEntity> = {
     [rootId]: {
       id: rootId,
-      name: 'Atlas',
+      name: PRIMARY_DEITIES.Orchestrator.name,
+      epithet: PRIMARY_DEITIES.Orchestrator.epithet,
       role: 'Orchestrator',
       status: 'running',
-      currentTask: 'Coordinate multi-agent execution tree and monitor active branches',
+      currentTask: 'Orchestrate Greek Pantheon swarm to deep-research & compare live web sources (Demo Mode)',
+      activeTool: 'Coordinating swarm',
       parentId: null,
-      childIds: ['bot-sage', 'bot-nova', 'bot-vektor'],
+      childIds: ['bot-athena', 'bot-artemis', 'bot-hermes'],
       depth: 0,
       createdAt: new Date(nowMs - 45_000).toISOString(),
       updatedAt: new Date(nowMs - 2_000).toISOString(),
+      sources: [],
       logs: makeStarterLogs(
         [
-          { offsetMs: -45_000, level: 'info', message: 'Bootstrapped root orchestration session.' },
-          { offsetMs: -38_000, level: 'success', message: 'Spawned Sage (Planner) for initial blueprint.' },
-          { offsetMs: -24_000, level: 'info', message: 'Dispatched Nova (Researcher) and Vektor (Architect).' },
-          { offsetMs: -2_000, level: 'debug', message: 'Monitoring active subtrees and worker heartbeats.' },
+          { offsetMs: -45_000, level: 'info', message: 'Olympus demo swarm initialized — configure an API key in Settings to run live AI missions!' },
+          { offsetMs: -36_000, level: 'success', message: 'Deployed Athena (Planner) to build evaluation criteria.' },
+          { offsetMs: -24_000, level: 'success', message: 'Deployed Artemis (Researcher) and Hermes (Scraper) in parallel.' },
+          { offsetMs: -2_000, level: 'thought', message: 'Monitoring deep website crawl progress across child Olympians.' },
         ],
         nowMs,
       ),
     },
-    'bot-sage': {
-      id: 'bot-sage',
-      name: 'Sage',
+    'bot-athena': {
+      id: 'bot-athena',
+      name: PRIMARY_DEITIES.Planner.name,
+      epithet: PRIMARY_DEITIES.Planner.epithet,
       role: 'Planner',
       status: 'done',
-      currentTask: 'Partition execution blueprint into parallel specialist tracks',
+      currentTask: 'Define research criteria, hidden-fee checks, and source verification strategy',
+      activeTool: null,
       parentId: rootId,
       childIds: [],
       depth: 1,
-      createdAt: new Date(nowMs - 38_000).toISOString(),
-      updatedAt: new Date(nowMs - 18_000).toISOString(),
+      createdAt: new Date(nowMs - 36_000).toISOString(),
+      updatedAt: new Date(nowMs - 14_000).toISOString(),
+      sources: [],
+      output:
+        '### Strategic Plan (Demo)\n- Compare official website direct rates vs OTA listings\n- Crawl `/policies` and `/faq` for hidden taxes & cancellation windows\n- Cross-verify walkability and guest sentiment across 2+ independent sources',
       logs: makeStarterLogs(
         [
-          { offsetMs: -38_000, level: 'info', message: 'Received root directive from Atlas.' },
-          { offsetMs: -31_000, level: 'debug', message: 'Evaluated dependency graph across 4 subsystems.' },
-          { offsetMs: -22_000, level: 'info', message: 'Published phased task allocation schema.' },
-          { offsetMs: -18_000, level: 'success', message: 'Planning phase completed; handed off to execution.' },
+          { offsetMs: -36_000, level: 'info', message: 'Received mission strategy directive from Zeus.' },
+          { offsetMs: -22_000, level: 'thought', message: 'Mapped 4 research angles and target URL patterns.' },
+          { offsetMs: -14_000, level: 'success', message: 'Strategy complete; handed rubric off to Artemis & Hermes.' },
         ],
         nowMs,
       ),
     },
-    'bot-nova': {
-      id: 'bot-nova',
-      name: 'Nova',
+    'bot-artemis': {
+      id: 'bot-artemis',
+      name: PRIMARY_DEITIES.Researcher.name,
+      epithet: PRIMARY_DEITIES.Researcher.epithet,
       role: 'Researcher',
       status: 'running',
-      currentTask: 'Gather telemetry patterns for real-time observability dashboards',
+      currentTask: 'Hunt official websites, direct booking pages, and neighborhood reviews',
+      activeTool: 'Searching web',
       parentId: rootId,
-      childIds: [],
+      childIds: ['bot-iris'],
       depth: 1,
       createdAt: new Date(nowMs - 24_000).toISOString(),
       updatedAt: new Date(nowMs - 3_000).toISOString(),
+      sources: [makeDemoSource(new Date(nowMs - 12_000).toISOString(), 0)],
       logs: makeStarterLogs(
         [
-          { offsetMs: -24_000, level: 'info', message: 'Initialized research scan on live graph rendering.' },
-          { offsetMs: -16_000, level: 'debug', message: 'Profiling React Flow update throughput at 60fps.' },
-          { offsetMs: -3_000, level: 'info', message: 'Synthesizing benchmark notes for parent orchestrator.' },
+          { offsetMs: -24_000, level: 'tool', message: 'Searching web: boutique hotels Alfama Lisbon official sites' },
+          { offsetMs: -15_000, level: 'info', message: 'Discovered 8 primary hotel domains with direct booking pages.' },
+          { offsetMs: -9_000, level: 'success', message: 'Spawned Iris (Scraper) to deep-crawl Memmo & Casa do Barão.' },
         ],
         nowMs,
       ),
     },
-    'bot-vektor': {
-      id: 'bot-vektor',
-      name: 'Vektor',
-      role: 'Architect',
+    'bot-hermes': {
+      id: 'bot-hermes',
+      name: PRIMARY_DEITIES.Scraper.name,
+      epithet: PRIMARY_DEITIES.Scraper.epithet,
+      role: 'Scraper',
       status: 'running',
-      currentTask: 'Specify hierarchical tree layout geometry and collision-free spacing',
+      currentTask: 'Deep-crawl official property websites for pricing, amenities, and cancellation rules',
+      activeTool: 'Deep crawling site',
       parentId: rootId,
-      childIds: ['bot-forge', 'bot-lens'],
+      childIds: ['bot-themis'],
       depth: 1,
       createdAt: new Date(nowMs - 24_000).toISOString(),
-      updatedAt: new Date(nowMs - 4_000).toISOString(),
+      updatedAt: new Date(nowMs - 2_000).toISOString(),
+      sources: [
+        makeDemoSource(new Date(nowMs - 14_000).toISOString(), 0),
+        makeDemoSource(new Date(nowMs - 6_000).toISOString(), 1),
+      ],
       logs: makeStarterLogs(
         [
-          { offsetMs: -24_000, level: 'info', message: 'Loaded system architecture constraints from Sage.' },
-          { offsetMs: -15_000, level: 'success', message: 'Spawned Forge (Coder) to implement core logic.' },
-          { offsetMs: -11_000, level: 'info', message: 'Spawned Lens (Reviewer) for continuous contract audits.' },
-          { offsetMs: -4_000, level: 'debug', message: 'Reviewing edge animation state transitions.' },
+          { offsetMs: -24_000, level: 'tool', message: 'Deep crawling santiagodealfama.com (depth 2, focus: rates, policies)' },
+          { offsetMs: -14_000, level: 'success', message: 'Scraped rooms & direct-booking benefits table (1,420 words).' },
+          { offsetMs: -6_000, level: 'info', message: 'Following internal link to /amenities-and-faq.' },
         ],
         nowMs,
       ),
     },
-    'bot-forge': {
-      id: 'bot-forge',
-      name: 'Forge',
-      role: 'Coder',
+    'bot-iris': {
+      id: 'bot-iris',
+      name: 'Iris',
+      epithet: 'Rainbow Messenger',
+      role: 'Scraper',
       status: 'running',
-      currentTask: 'Implement deterministic simulation tick reducer and log buffer capping',
-      parentId: 'bot-vektor',
+      currentTask: 'Crawl sub-pages for hidden tourist taxes, breakfast inclusions, and transfer fees',
+      activeTool: 'Extracting tables',
+      parentId: 'bot-artemis',
       childIds: [],
       depth: 2,
-      createdAt: new Date(nowMs - 15_000).toISOString(),
+      createdAt: new Date(nowMs - 9_000).toISOString(),
       updatedAt: new Date(nowMs - 1_500).toISOString(),
+      sources: [makeDemoSource(new Date(nowMs - 4_000).toISOString(), 1)],
       logs: makeStarterLogs(
         [
-          { offsetMs: -15_000, level: 'info', message: 'Assigned implementation spec by Vektor.' },
-          { offsetMs: -9_000, level: 'debug', message: 'Drafting immutable state helpers and log ring buffer.' },
-          { offsetMs: -1_500, level: 'info', message: 'Integrating status transition guards for active workers.' },
+          { offsetMs: -9_000, level: 'info', message: 'Summoned by Artemis for parallel site extraction.' },
+          { offsetMs: -4_000, level: 'tool', message: 'Scraping memmohotels.com/alfama/offers' },
         ],
         nowMs,
       ),
     },
-    'bot-lens': {
-      id: 'bot-lens',
-      name: 'Lens',
+    'bot-themis': {
+      id: 'bot-themis',
+      name: PRIMARY_DEITIES.Reviewer.name,
+      epithet: PRIMARY_DEITIES.Reviewer.epithet,
       role: 'Reviewer',
-      status: 'idle',
-      currentTask: 'Await next implementation checkpoint from Forge for strict audit',
-      parentId: 'bot-vektor',
+      status: 'waiting',
+      currentTask: 'Await remaining rate tables from Hermes to cross-verify total stay costs',
+      activeTool: 'Awaiting Hermes',
+      parentId: 'bot-hermes',
       childIds: [],
       depth: 2,
-      createdAt: new Date(nowMs - 11_000).toISOString(),
-      updatedAt: new Date(nowMs - 5_000).toISOString(),
+      createdAt: new Date(nowMs - 10_000).toISOString(),
+      updatedAt: new Date(nowMs - 4_000).toISOString(),
+      sources: [],
       logs: makeStarterLogs(
         [
-          { offsetMs: -11_000, level: 'info', message: 'Initialized static analysis and type-contract checks.' },
-          { offsetMs: -7_000, level: 'success', message: 'Verified initial schema alignment across modules.' },
-          { offsetMs: -5_000, level: 'warn', message: 'Paused pending upstream build artifact from Forge.' },
+          { offsetMs: -10_000, level: 'info', message: 'Initialized cross-source fact verification rules.' },
+          { offsetMs: -4_000, level: 'warn', message: 'Waiting on next scraped tariff page from Hermes.' },
         ],
         nowMs,
       ),
@@ -463,31 +486,27 @@ export function createInitialSimulationState(): BotSimulationState {
   };
 }
 
-export function advanceSimulationTick(
-  state: BotSimulationState,
-): BotSimulationState {
+export function advanceSimulationTick(state: BotSimulationState): BotSimulationState {
   const nowIso = new Date().toISOString();
   let nextBots: Record<string, BotEntity> = { ...state.bots };
-  const botList = Object.values(nextBots);
 
-  // 1. Append logs & rotate tasks on currently running bots
-  for (const existing of botList) {
-    if (existing.status !== 'running') {
-      continue;
-    }
+  for (const existing of Object.values(nextBots)) {
+    if (existing.status !== 'running') continue;
 
     const updated = cloneBot(existing);
-    const messagePool = ROLE_LOG_MESSAGES[updated.role];
-    const pickedLog = pickRandom(messagePool);
+    const pickedLog = pickRandom(ROLE_LOG_MESSAGES[updated.role]);
+    updated.logs = appendLog(updated.logs, pickedLog.level, pickedLog.message, nowIso);
+    updated.activeTool = pickRandom(ROLE_ACTIVE_TOOLS[updated.role]);
 
-    updated.logs = appendLog(
-      updated.logs,
-      pickedLog.level,
-      pickedLog.message,
-      nowIso,
-    );
+    if (
+      (updated.role === 'Scraper' || updated.role === 'Researcher') &&
+      updated.sources.length < 6 &&
+      Math.random() < 0.38
+    ) {
+      updated.sources = [...updated.sources, makeDemoSource(nowIso, Math.min(updated.depth, 2))];
+    }
 
-    if (Math.random() < 0.35) {
+    if (Math.random() < 0.3) {
       updated.currentTask = pickDifferentTask(updated.role, updated.currentTask);
     }
 
@@ -495,13 +514,12 @@ export function advanceSimulationTick(
     nextBots[updated.id] = updated;
   }
 
-  // 2. Transition statuses cleanly
-  const currentList = Object.values(nextBots);
-  for (const existing of currentList) {
-    if (existing.status === 'idle') {
-      if (Math.random() < 0.35) {
+  for (const existing of Object.values(nextBots)) {
+    if (existing.status === 'idle' || existing.status === 'waiting') {
+      if (Math.random() < 0.4) {
         const updated = cloneBot(existing);
         updated.status = 'running';
+        updated.activeTool = pickRandom(ROLE_ACTIVE_TOOLS[updated.role]);
         updated.currentTask = pickDifferentTask(updated.role, updated.currentTask);
         updated.logs = appendLog(
           updated.logs,
@@ -520,24 +538,26 @@ export function advanceSimulationTick(
       const enoughWorkDone = existing.logs.length >= 6;
       const roll = Math.random();
 
-      if (!childrenBusy && enoughWorkDone && roll < 0.18) {
+      if (!childrenBusy && enoughWorkDone && roll < 0.16) {
         const updated = cloneBot(existing);
         updated.status = 'done';
+        updated.activeTool = null;
         updated.logs = appendLog(
           updated.logs,
           'success',
-          `Completed assigned task: ${updated.currentTask}`,
+          `Completed directive: ${updated.currentTask}`,
           nowIso,
         );
         updated.updatedAt = nowIso;
         nextBots[updated.id] = updated;
-      } else if (roll >= 0.18 && roll < 0.3) {
+      } else if (roll >= 0.16 && roll < 0.26) {
         const updated = cloneBot(existing);
-        updated.status = 'idle';
+        updated.status = 'waiting';
+        updated.activeTool = 'Awaiting peer signal';
         updated.logs = appendLog(
           updated.logs,
           'warn',
-          'Yielding execution slot while awaiting downstream signal.',
+          'Paused briefly while awaiting upstream verification.',
           nowIso,
         );
         updated.updatedAt = nowIso;
@@ -546,78 +566,21 @@ export function advanceSimulationTick(
     }
   }
 
-  // 3. Dynamically spawn new child bots under eligible running parents
   const totalBots = Object.keys(nextBots).length;
-  const runningBots = Object.values(nextBots).filter(
-    (bot) => bot.status === 'running',
-  );
-
+  const runningBots = Object.values(nextBots).filter((bot) => bot.status === 'running');
   const eligibleParents = runningBots.filter(
-    (bot) =>
-      bot.depth < AUTO_MAX_DEPTH &&
-      bot.childIds.length < MAX_AUTO_CHILDREN_PER_PARENT,
+    (bot) => bot.depth < AUTO_MAX_DEPTH && bot.childIds.length < MAX_AUTO_CHILDREN_PER_PARENT,
   );
 
-  const shouldSpawn =
+  if (
     totalBots < AUTO_MAX_BOTS &&
     eligibleParents.length > 0 &&
-    (runningBots.length <= 2 || Math.random() < 0.48);
-
-  if (shouldSpawn) {
-    // Prefer deeper active workers occasionally so the mind map grows multi-level
-    const nonRootEligible = eligibleParents.filter((b) => b.id !== state.rootId);
-    const pool =
-      nonRootEligible.length > 0 && Math.random() < 0.7
-        ? nonRootEligible
-        : eligibleParents;
+    (runningBots.length <= 2 || Math.random() < 0.44)
+  ) {
+    const nonRoot = eligibleParents.filter((b) => b.id !== state.rootId);
+    const pool = nonRoot.length > 0 && Math.random() < 0.68 ? nonRoot : eligibleParents;
     const parent = pickRandom(pool);
-    const spawned = spawnChildUnderParent(nextBots, parent.id, nowIso, 'auto');
-    nextBots = spawned.bots;
-  }
-
-  // 4. Keep orchestration lively if active running bots drop below 2
-  const afterSpawnList = Object.values(nextBots);
-  const activeCount = afterSpawnList.filter(
-    (bot) => bot.status === 'running',
-  ).length;
-
-  if (activeCount < 2) {
-    const idleCandidate = afterSpawnList.find((bot) => bot.status === 'idle');
-    if (idleCandidate) {
-      const woken = cloneBot(idleCandidate);
-      woken.status = 'running';
-      woken.currentTask = pickDifferentTask(woken.role, woken.currentTask);
-      woken.logs = appendLog(
-        woken.logs,
-        'info',
-        'Woken by orchestrator heartbeat to maintain active throughput.',
-        nowIso,
-      );
-      woken.updatedAt = nowIso;
-      nextBots[woken.id] = woken;
-    } else if (
-      Object.keys(nextBots).length < AUTO_MAX_BOTS &&
-      nextBots[state.rootId]
-    ) {
-      const root = nextBots[state.rootId];
-      if (root.status !== 'running') {
-        const wokenRoot = cloneBot(root);
-        wokenRoot.status = 'running';
-        wokenRoot.logs = appendLog(
-          wokenRoot.logs,
-          'info',
-          'Initiating next orchestration wave.',
-          nowIso,
-        );
-        wokenRoot.updatedAt = nowIso;
-        nextBots[root.id] = wokenRoot;
-      }
-
-      if (root.depth < AUTO_MAX_DEPTH) {
-        const spawned = spawnChildUnderParent(nextBots, root.id, nowIso, 'auto');
-        nextBots = spawned.bots;
-      }
-    }
+    nextBots = spawnChildUnderParent(nextBots, parent.id, nowIso, 'auto').bots;
   }
 
   return {
@@ -630,49 +593,27 @@ export function advanceSimulationTick(
 export function createManualChildBot(
   state: BotSimulationState,
   preferredParentId?: string,
+  role?: BotRole,
+  task?: string,
 ): BotSimulationState {
   const nowIso = new Date().toISOString();
-
-  const initialParent: BotEntity | undefined =
+  const initialParent =
     (preferredParentId ? state.bots[preferredParentId] : undefined) ??
     (state.selectedBotId ? state.bots[state.selectedBotId] : undefined) ??
-    Object.values(state.bots).find((bot) => bot.status === 'running') ??
+    Object.values(state.bots).find((b) => b.status === 'running') ??
     state.bots[state.rootId];
 
-  if (!initialParent) {
-    return state;
-  }
+  if (!initialParent) return state;
 
   let parent: BotEntity = initialParent;
-
-  // Respect manual depth cap cleanly by stepping up if a max-depth leaf is selected
   while (parent.depth >= MANUAL_MAX_DEPTH && parent.parentId) {
     const upper: BotEntity | undefined = state.bots[parent.parentId];
-    if (!upper) {
-      break;
-    }
+    if (!upper) break;
     parent = upper;
   }
 
-  if (
-    Object.keys(state.bots).length >= MANUAL_MAX_BOTS ||
-    parent.depth >= MANUAL_MAX_DEPTH
-  ) {
-    const cappedParent = cloneBot(parent);
-    cappedParent.logs = appendLog(
-      cappedParent.logs,
-      'warn',
-      `Manual spawn skipped: safety cap (${MANUAL_MAX_BOTS} bots / depth ${MANUAL_MAX_DEPTH}) reached.`,
-      nowIso,
-    );
-    cappedParent.updatedAt = nowIso;
-    return {
-      ...state,
-      bots: {
-        ...state.bots,
-        [cappedParent.id]: cappedParent,
-      },
-    };
+  if (Object.keys(state.bots).length >= MANUAL_MAX_BOTS || parent.depth >= MANUAL_MAX_DEPTH) {
+    return state;
   }
 
   const { bots: nextBots, newBot } = spawnChildUnderParent(
@@ -680,6 +621,8 @@ export function createManualChildBot(
     parent.id,
     nowIso,
     'manual',
+    role,
+    task,
   );
 
   return {

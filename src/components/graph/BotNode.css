@@ -1,10 +1,10 @@
 .bot-node {
   position: relative;
-  width: 264px;
-  height: 122px;
+  width: 280px;
+  min-height: 148px;
   padding: 11px 13px 10px;
   border-radius: 12px;
-  background: linear-gradient(180deg, rgba(26, 34, 52, 0.96) 0%, rgba(17, 24, 39, 0.98) 100%);
+  background: linear-gradient(180deg, rgba(26, 34, 52, 0.97) 0%, rgba(15, 22, 36, 0.99) 100%);
   border: 1px solid var(--border-subtle);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.38);
   display: flex;
@@ -25,36 +25,48 @@
   transform: translateY(-1px);
 }
 
-/* Status-specific card accents */
+/* Status accents */
 .bot-node--running {
-  border-color: rgba(34, 211, 238, 0.42);
+  border-color: rgba(34, 211, 238, 0.45);
   box-shadow:
-    0 8px 22px rgba(0, 0, 0, 0.4),
-    0 0 18px rgba(34, 211, 238, 0.12);
+    0 8px 22px rgba(0, 0, 0, 0.42),
+    0 0 18px rgba(34, 211, 238, 0.14);
+}
+
+.bot-node--waiting {
+  border-color: rgba(167, 139, 250, 0.48);
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.42),
+    0 0 18px rgba(167, 139, 250, 0.14);
 }
 
 .bot-node--idle {
-  border-color: rgba(245, 158, 11, 0.32);
+  border-color: rgba(245, 158, 11, 0.34);
 }
 
 .bot-node--done {
-  border-color: rgba(16, 185, 129, 0.28);
+  border-color: rgba(16, 185, 129, 0.3);
 }
 
-/* Selected state overrides */
+.bot-node--error {
+  border-color: rgba(248, 113, 113, 0.48);
+  box-shadow: 0 8px 20px rgba(248, 113, 113, 0.12);
+}
+
+/* Selected state */
 .bot-node--selected {
   border-color: var(--border-active);
   box-shadow:
-    0 0 0 2px rgba(56, 189, 248, 0.28),
+    0 0 0 2px rgba(56, 189, 248, 0.3),
     0 12px 28px rgba(0, 0, 0, 0.55),
-    0 0 24px rgba(56, 189, 248, 0.18);
+    0 0 24px rgba(56, 189, 248, 0.2);
 }
 
 .bot-node--selected:hover {
   border-color: var(--border-active);
 }
 
-/* React Flow Handles */
+/* Handles */
 .bot-node__handle {
   width: 8px;
   height: 8px;
@@ -68,6 +80,10 @@
   border-color: var(--status-running);
 }
 
+.bot-node--waiting .bot-node__handle {
+  border-color: var(--status-waiting);
+}
+
 .bot-node--selected .bot-node__handle {
   border-color: var(--border-active);
   background: var(--border-active);
@@ -76,7 +92,7 @@
 /* Header */
 .bot-node__header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 8px;
   min-width: 0;
@@ -91,8 +107,8 @@
 }
 
 .bot-node__icon {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
@@ -105,8 +121,14 @@
 
 .bot-node__icon--running {
   background: rgba(34, 211, 238, 0.12);
-  border-color: rgba(34, 211, 238, 0.3);
+  border-color: rgba(34, 211, 238, 0.32);
   color: var(--status-running);
+}
+
+.bot-node__icon--waiting {
+  background: rgba(167, 139, 250, 0.14);
+  border-color: rgba(167, 139, 250, 0.35);
+  color: var(--status-waiting);
 }
 
 .bot-node__icon--idle {
@@ -121,6 +143,12 @@
   color: var(--status-done);
 }
 
+.bot-node__icon--error {
+  background: rgba(248, 113, 113, 0.12);
+  border-color: rgba(248, 113, 113, 0.34);
+  color: var(--status-error);
+}
+
 .bot-node__titles {
   display: flex;
   flex-direction: column;
@@ -128,9 +156,16 @@
   gap: 2px;
 }
 
+.bot-node__name-line {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
 .bot-node__name {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 13.5px;
+  font-weight: 650;
   line-height: 1.15;
   color: var(--text-primary);
   white-space: nowrap;
@@ -141,16 +176,24 @@
 .bot-node__role {
   display: inline-flex;
   align-items: center;
-  width: fit-content;
-  font-size: 10px;
-  font-weight: 500;
+  flex-shrink: 0;
+  font-size: 9.5px;
+  font-weight: 600;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: var(--text-secondary);
-  background: rgba(148, 163, 184, 0.1);
+  color: var(--accent-indigo);
+  background: rgba(129, 140, 248, 0.12);
   border-radius: 4px;
   padding: 1px 5px;
   line-height: 1.3;
+}
+
+.bot-node__epithet {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Status Pill */
@@ -160,7 +203,7 @@
   gap: 5px;
   padding: 3px 7px;
   border-radius: 999px;
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 600;
   line-height: 1;
   flex-shrink: 0;
@@ -171,6 +214,12 @@
   color: var(--status-running);
   background: rgba(34, 211, 238, 0.12);
   border-color: rgba(34, 211, 238, 0.28);
+}
+
+.bot-node__status--waiting {
+  color: var(--status-waiting);
+  background: rgba(167, 139, 250, 0.14);
+  border-color: rgba(167, 139, 250, 0.34);
 }
 
 .bot-node__status--idle {
@@ -185,6 +234,12 @@
   border-color: rgba(16, 185, 129, 0.26);
 }
 
+.bot-node__status--error {
+  color: var(--status-error);
+  background: rgba(248, 113, 113, 0.12);
+  border-color: rgba(248, 113, 113, 0.32);
+}
+
 .bot-node__status-dot {
   position: relative;
   width: 6px;
@@ -193,12 +248,13 @@
   background: currentColor;
 }
 
-.bot-node__status--running .bot-node__status-dot::after {
+.bot-node__status--running .bot-node__status-dot::after,
+.bot-node__status--waiting .bot-node__status-dot::after {
   content: '';
   position: absolute;
   inset: -3px;
   border-radius: 50%;
-  border: 1.5px solid var(--status-running);
+  border: 1.5px solid currentColor;
   animation: bot-pulse 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
@@ -217,7 +273,7 @@
   }
 }
 
-/* Current Task */
+/* Task */
 .bot-node__task {
   margin: 0;
   font-size: 11.5px;
@@ -228,7 +284,43 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   word-break: break-word;
-  min-height: 32px;
+  min-height: 30px;
+}
+
+/* Active tool ticker */
+.bot-node__tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: 1px solid transparent;
+}
+
+.bot-node__tool--running {
+  color: #67e8f9;
+  background: rgba(34, 211, 238, 0.08);
+  border-color: rgba(34, 211, 238, 0.22);
+}
+
+.bot-node__tool--waiting {
+  color: #c4b5fd;
+  background: rgba(167, 139, 250, 0.1);
+  border-color: rgba(167, 139, 250, 0.25);
+}
+
+.bot-node__tool-icon {
+  flex-shrink: 0;
+}
+
+.bot-node__tool-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Footer */
@@ -262,4 +354,8 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+}
+
+.bot-node__metric--sources {
+  color: var(--status-running);
 }
