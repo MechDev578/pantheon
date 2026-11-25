@@ -8,3 +8,4 @@ release
 .env.local
 .env.*.local
 .pantheon-data
+package-lock.json
