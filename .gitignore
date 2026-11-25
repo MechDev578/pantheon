@@ -4,3 +4,4 @@ dist-mcp
 release
 .netlify
 .DS_Store
+package-lock.json
