@@ -1,0 +1,34 @@
+.bot-graph-canvas {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-color: var(--bg-canvas);
+}
+
+.bot-graph-canvas .react-flow__pane {
+  cursor: grab;
+}
+
+.bot-graph-canvas .react-flow__pane:active {
+  cursor: grabbing;
+}
+
+.bot-graph-canvas .react-flow__node {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.bot-graph-canvas .react-flow__node.selected {
+  box-shadow: none;
+}
+
+.bot-graph-canvas .react-flow__minimap {
+  right: 16px;
+  bottom: 16px;
+}
+
+.bot-graph-canvas .react-flow__controls {
+  left: 16px;
+  bottom: 16px;
+}
