@@ -1,11 +1,15 @@
 {
   "name": "bot-mind-map",
   "private": true,
-  "version": "0.1.0",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "dev": "concurrently -k -n ENGINE,UI -c cyan,magenta \"npm run server\" \"npm run dev:ui\"",
+    "dev:ui": "vite",
+    "server": "tsx watch server/index.ts",
+    "server:start": "tsx server/index.ts",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.server.json --noEmit",
+    "build": "npm run typecheck && vite build",
     "build:mcp": "tsc --noEmit && vite build --config vite.mcp.config.ts",
     "build:desktop": "npm run build:mcp && bash desktop/build-app.sh",
     "preview": "vite preview"
@@ -13,14 +17,19 @@
   "dependencies": {
     "@modelcontextprotocol/ext-apps": "^1.0.0",
     "@xyflow/react": "^12.4.4",
+    "cheerio": "^1.0.0",
     "lucide-react": "^0.469.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@netlify/functions": "^3.0.1",
+    "@types/node": "^22.10.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.0",
+    "tsx": "^4.19.2",
     "typescript": "^5.6.3",
     "vite": "^6.0.5",
     "vite-plugin-singlefile": "^2.0.3"

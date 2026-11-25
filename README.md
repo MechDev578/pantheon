@@ -1,97 +1,93 @@
-# Pantheon: The Bot Overlord
+# Pantheon v2: The Bot Overlord
 
-**Pantheon: The Bot Overlord** is a live, interactive multi-agent orchestration visualizer (**Bot Mind Map**) paired with custom Antigravity subagent definitions (`architect` and `coder`). It renders a dynamic hierarchical node graph where a parent orchestrator spawns nested child bots, transitions statuses in real time, and streams live execution logs into a side inspector panel.
+**Pantheon v2** is a real, live multi-agent **Bot Manager & Deep Web Research Control Plane** modeled after Greek Mythology. Deploy a mission to **Zeus**, choose whether Zeus asks clarifying questions first or autonomously assumes context, and watch an Olympian swarm (**Athena**, **Artemis**, **Hermes**, **Iris**, **Themis**, **Apollo**, and more) spawn in parallel, search the web, recursively deep-crawl websites, and synthesize cited reports in real time on an interactive Mind Map.
 
----
-
-## Features
-
-- **Live Multi-Agent Node Graph (`@xyflow/react`):** Interactive canvas with pan, zoom, minimap, dot grid background, and automatic non-overlapping top-to-bottom tree layout.
-- **Custom Bot Cards & Animated Connections:**
-  - Displays each bot's name, role (`Orchestrator`, `Planner`, `Researcher`, `Architect`, `Coder`, `Reviewer`, `Tester`, `Synthesizer`), live status (`running`, `idle`, `done`), current task, depth level, child count, and log count.
-  - Pulsing status indicator and animated cyan edges for active (`running`) connections.
-  - Preserves manually dragged node positions across live ticks, with one-click **Auto-Layout** to re-center and fit the view.
-- **Live Log Inspector Side Panel:** Click any bot node to inspect its full task description, metadata, timestamps (`Created` / `Updated`), clickable parent/child navigation chips, and an auto-scrolling monospace log stream (`INFO`, `WARN`, `SUCCESS`, `DEBUG`).
-- **Interactive Controls:** Pause/Resume simulation, manually spawn child bots under any selected agent, Auto-Layout, and Reset.
-- **Custom Antigravity Subagents:** Ships with workspace-scoped `.agents/agents/architect.md` and `.agents/agents/coder.md` definitions.
+> **Versioning:**
+> - **`v1.0.0` (`main` branch / tag `v1.0.0`):** Pure frontend Bot Mind Map visualizer (offline mock simulator).
+> - **`v2` (`v2` branch):** Real multi-provider AI orchestration engine, Ask-First vs. Auto-Assume context modes, live web search & recursive website deep-crawling, Greek mythology bot personas, Local Mac Engine + Netlify Cloud streaming backend.
+> - **`v3` (Planned Roadmap):** Action-capable bots with human-in-the-loop approvals — hotel & restaurant reservations, automated itinerary booking, landlord email outreach, calendar sync, and OAuth integrations.
 
 ---
 
-## Ways to Run & Use Pantheon
+## Key Capabilities in v2
 
-### 1. Inside Antigravity (Permanent Sidebar & Side-Pane UI Button)
-Packaged as a global Antigravity MCP App plugin at `~/.gemini/config/plugins/bot-mind-map/`:
-- **Left Sidebar:** Click **Bot Mind Map** for a full-page view.
-- **Side Pane (`+` menu):** Dock **Bot Mind Map** right next to any chat.
-- **Rebuild & sync plugin after edits:**
-  ```bash
-  npm run build:mcp
-  cp dist-mcp/index.html ~/.gemini/config/plugins/bot-mind-map/dist/index.html
-  ```
+- **Greek Mythology Olympian Roster:**
+  - **Zeus** (*Orchestrator*) — Analyzes goals, asks clarifying questions or records assumptions, decomposes missions into parallel tracks, and coordinates the swarm.
+  - **Athena** (*Planner*) — Designs evaluation rubrics and research strategies.
+  - **Artemis** (*Researcher*) — Hunts authoritative websites, direct booking pages, reviews, and docs across multiple search angles.
+  - **Hermes / Iris / Odysseus / Poseidon** (*Deep Scrapers*) — Fetch and recursively crawl websites (`deep_crawl`), extracting headings, Markdown tables, pricing, policies, and sub-links.
+  - **Daedalus** (*Architect*) & **Hephaestus** (*Coder*) — Design technical blueprints, itineraries, schemas, and code.
+  - **Themis** (*Reviewer*) & **Cerberus** (*Tester*) — Fact-check claims across scraped sources and audit edge cases.
+  - **Apollo** (*Synthesizer*) — Compiles all sub-agent findings and scraped websites into a final Markdown Mission Report with clickable citations.
+- **Smart Context Strategy Toggle:**
+  - **Ask First:** Zeus inspects your goal and pauses in a `waiting` state with targeted clarifying questions + clickable quick-options if anything is ambiguous (with a 1-click *Skip & Assume* override).
+  - **Auto-Assume:** Zeus infers practical defaults, logs every assumption transparently, and deploys specialist bots immediately.
+- **Deep Web Search & Multi-Page Crawling (`engine/webTools.ts`):**
+  - Works out of the box with zero search API keys (built-in DuckDuckGo HTML/Lite + Wikipedia fallback), plus optional **Tavily** or **Brave Search** API keys in Settings.
+  - `scrape_url` & `deep_crawl` parse live HTML with `cheerio` into clean Markdown (preserving tables, headings, lists, and pricing) and follow relevance-scored sub-links up to configurable crawl depths (`Quick`, `Deep`, `Abyssal`).
+- **Multi-Provider AI Brain (`engine/llmClient.ts`):**
+  - Supports **Google Gemini**, **OpenAI**, and **Anthropic Claude** with native parallel tool calling.
+  - Configure keys via local `.env` **or** directly in the Pantheon UI **Settings** modal (stored strictly in browser `localStorage`, never committed to Git).
+- **Live Interactive Bot Mind Map & 3-Tab Inspector:**
+  - Real-time node graph showing active tool tickers (`Deep crawling...`, `Searching web...`, `Awaiting Hermes...`), scraped page counts, and nested child spawns.
+  - Click any Olympian node to view **Live Telemetry Logs**, **Scraped Sources** (clickable URLs, word counts, crawl depth), and **Bot Output** — plus deploy custom follow-up sub-bots directly under any node.
+  - Includes a built-in **Demo Mode** toggle so visitors without an API key can still explore the Greek mythology swarm live.
 
-### 2. Hosted Web App on Netlify (Always Online + Mac Dock)
-- **Live URL:** https://bot-mind-map-live.netlify.app
-- **Install as a Mac Dock App:** Open the URL in **Safari** → *File → Add to Dock…* (or **Chrome** → *Install page as app*).
+---
 
-### 3. Standalone Offline macOS Desktop App (`.app`)
-Compiled as a lightweight (~904 KB) native Apple Silicon Swift + `WKWebView` app with zero external browser or server required:
-- **Bundle Location:** `release/Bot Mind Map.app`
-- **Install permanently:** Drag `release/Bot Mind Map.app` into `/Applications`, or double-click it directly from Finder.
-- **Rebuild after code changes:**
-  ```bash
-  npm run build:desktop
-  ```
+## Quick Start
 
-### 4. Local Development Server
+### 1. Local Full-Power Mode (Recommended — Unlimited Runtime & Deepest Crawls)
 ```bash
+git clone -b v2 https://github.com/MechDev578/pantheon.git
+cd pantheon
 npm install
+cp .env.example .env   # Optional: add GEMINI_API_KEY, OPENAI_API_KEY, or ANTHROPIC_API_KEY (or paste in UI Settings)
 npm run dev
 ```
-Open http://localhost:5173/ in your browser.
+- Opens the **React UI** at `http://localhost:5173` and the **Local Pantheon Engine** at `http://127.0.0.1:8787` (automatically proxied via `/api`).
+- Missions persist locally in `.pantheon-data/` (gitignored; API keys are never written to disk).
+
+### 2. Cloud Mode on Netlify
+Deploy the `v2` branch to Netlify:
+- Netlify builds the Vite frontend (`dist/`) and bundles `netlify/functions/pantheon.mts` at `/api/cloud/*`.
+- Add `GEMINI_API_KEY`, `OPENAI_API_KEY`, or `ANTHROPIC_API_KEY` as Netlify environment variables (or let users bring their own key in the UI Settings modal).
+
+### 3. Standalone Offline macOS Desktop App (`.app`)
+```bash
+npm run build:desktop
+```
+Outputs `release/Bot Mind Map.app`.
 
 ---
 
-## Project Structure
+## Project Structure (v2)
 
 ```text
-01_Pantheon/
-├── .agents/agents/
-│   ├── architect.md              # Technical Architect subagent (model: pro)
-│   └── coder.md                  # Software Engineer subagent (model: flash)
-├── desktop/
-│   ├── main.swift                # Native macOS Cocoa + WKWebView wrapper
-│   ├── Info.plist                # macOS bundle metadata
-│   └── build-app.sh              # Compiles release/Bot Mind Map.app
-├── public/
-│   ├── icon.svg                  # App icon
-│   └── manifest.json             # PWA manifest for Add to Dock / Install
-├── release/
-│   └── Bot Mind Map.app          # Built standalone macOS desktop app
+pantheon/
+├── engine/                       # Shared runtime-agnostic multi-agent core
+│   ├── types.ts                  # Canonical Mission, Bot, Source, Stream contracts
+│   ├── pantheonRoster.ts         # Greek mythology deities, personas & depth presets
+│   ├── llmClient.ts              # Unified Gemini / OpenAI / Anthropic tool-calling client
+│   ├── webTools.ts               # Web search, SSRF-safe HTML scraper & recursive deep crawler
+│   ├── agentRunner.ts            # ReAct tool-calling loop with parallel sub-agent spawning
+│   └── missionOrchestrator.ts    # Zeus Context Analyzer -> Parallel Swarm -> Apollo Report
+├── server/
+│   └── index.ts                  # Local Mac Node.js HTTP + SSE engine (:8787)
+├── netlify/functions/
+│   └── pantheon.mts              # Netlify Cloud Function (/api/cloud/*) with SSE streaming
 ├── src/
-│   ├── main.tsx                  # Entry point + MCP App host bridge init
-│   ├── index.css                 # Dark observability theme tokens & React Flow styles
-│   ├── App.tsx / App.css         # Root layout shell & state wiring
-│   ├── types/
-│   │   └── bot.ts                # Shared TypeScript contracts
-│   ├── engine/
-│   │   └── mockOrchestrator.ts   # Pure simulation tick engine & manual spawning
-│   ├── hooks/
-│   │   └── useBotSimulation.ts   # React simulation state & 1.4s tick loop
-│   ├── utils/
-│   │   ├── treeLayout.ts         # Deterministic recursive subtree-width TB layout
-│   │   └── mcpAppBridge.ts       # @modelcontextprotocol/ext-apps host bridge
+│   ├── hooks/usePantheon.ts      # Unified Local Engine + Netlify Cloud + Demo state manager
 │   └── components/
-│       ├── graph/                # BotGraphCanvas, BotNode, BotEdge
-│       ├── header/               # HeaderToolbar (live badge, stats, controls)
-│       └── inspector/            # LogInspectorPanel (metadata, links, live logs)
-├── index.html
-├── netlify.toml                  # Netlify build & SPA redirect config
-├── package.json
-├── PLAN.md                       # Architecture blueprint written by architect subagent
-├── README.md
-├── tsconfig.json
-├── vite.config.ts                # Standard web build config
-└── vite.mcp.config.ts            # Single-file HTML build for MCP App & macOS app
+│       ├── graph/                # BotGraphCanvas, BotNode (Greek deity cards), BotEdge
+│       ├── header/               # HeaderToolbar (runtime switcher, stats, controls)
+│       ├── inspector/            # 3-tab Log/Sources/Output Inspector + Sub-Bot deployer
+│       ├── mission/              # MissionLauncher, ClarificationModal, MissionReportModal
+│       └── settings/             # Multi-provider AI & Search key configuration modal
+├── desktop/                      # Native macOS Swift + WKWebView wrapper
+├── .env.example                  # Optional environment variable template
+├── netlify.toml                  # Netlify build & Functions config
+└── package.json
 ```
 
 ---
@@ -100,8 +96,10 @@ Open http://localhost:5173/ in your browser.
 
 | Command | Description |
 | :--- | :--- |
-| `npm run dev` | Start the local Vite development server |
-| `npm run build` | Type-check (`tsc --noEmit`) and build the web bundle to `dist/` |
-| `npm run build:mcp` | Build a self-contained single-file HTML bundle to `dist-mcp/index.html` |
-| `npm run build:desktop` | Build `dist-mcp/index.html` and compile `release/Bot Mind Map.app` |
-| `npm run preview` | Preview the production `dist/` build locally |
+| `npm run dev` | Run both the Local Pantheon Engine (`:8787`) and Vite UI (`:5173`) |
+| `npm run dev:ui` | Run the Vite frontend only |
+| `npm run server` | Run the Local Pantheon Engine only (with hot reload) |
+| `npm run typecheck` | Strictly type-check frontend, engine, server, and Netlify function |
+| `npm run build` | Type-check everything and build the production bundle to `dist/` |
+| `npm run build:mcp` | Build single-file HTML bundle for Antigravity MCP App |
+| `npm run build:desktop` | Build standalone macOS `.app` bundle |
