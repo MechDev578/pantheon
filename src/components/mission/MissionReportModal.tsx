@@ -47,44 +47,52 @@ export function MissionReportModal({ mission, isOpen, onClose }: MissionReportMo
   };
 
   return (
-    <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="Mission Final Report">
+    <div
+      className="modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Mission Final Report"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="report-modal">
         <div className="report-header">
           <div className="report-title-group">
             <span className="report-badge">
-              <Sparkles size={14} />
-              <span>Apollo Final Report</span>
+              <Sparkles size={13} />
+              <span>Apollo final report</span>
             </span>
             <h2 className="report-title">{mission.title}</h2>
-            <p className="report-meta">
-              {Object.keys(mission.bots).length} Olympians · {uniqueSources.length} verified websites scraped ·{' '}
+            <p className="report-meta mono">
+              {Object.keys(mission.bots).length} Olympians · {uniqueSources.length} verified pages ·{' '}
               {mission.provider}/{mission.model}
             </p>
           </div>
           <div className="report-actions">
-            <button type="button" className="report-btn" onClick={handleCopy}>
+            <button type="button" className="btn btn-secondary" onClick={handleCopy}>
               {copied ? <Check size={14} /> : <Copy size={14} />}
               <span>{copied ? 'Copied' : 'Copy MD'}</span>
             </button>
-            <button type="button" className="report-btn" onClick={handleDownload}>
+            <button type="button" className="btn btn-secondary" onClick={handleDownload}>
               <Download size={14} />
               <span>Download .md</span>
             </button>
             <button
               type="button"
-              className="modal-close-btn"
+              className="btn btn-ghost btn-icon"
               onClick={onClose}
               aria-label="Close report"
             >
-              <X size={16} />
+              <X size={16} strokeWidth={1.6} />
             </button>
           </div>
         </div>
 
-        <div className="report-content">
+        <div className="report-content scroll-quiet">
           {mission.assumptions.length > 0 && (
             <div className="report-assumptions">
-              <div className="report-section-tag">Assumptions Logged</div>
+              <div className="report-section-tag">Assumptions logged</div>
               <ul>
                 {mission.assumptions.map((a) => (
                   <li key={a}>{a}</li>
@@ -99,7 +107,7 @@ export function MissionReportModal({ mission, isOpen, onClose }: MissionReportMo
             <div className="report-sources">
               <div className="report-section-tag">
                 <Globe size={12} />
-                <span>Verified Scraped Websites ({uniqueSources.length})</span>
+                <span>Verified scraped websites ({uniqueSources.length})</span>
               </div>
               <div className="report-source-grid">
                 {uniqueSources.map((src) => (
@@ -111,11 +119,11 @@ export function MissionReportModal({ mission, isOpen, onClose }: MissionReportMo
                     className="report-source-card"
                   >
                     <div className="report-source-top">
-                      <span className="report-source-domain">{src.domain}</span>
+                      <span className="report-source-domain mono">{src.domain}</span>
                       <ExternalLink size={11} />
                     </div>
                     <span className="report-source-title">{src.title}</span>
-                    <span className="report-source-stats">
+                    <span className="report-source-stats mono">
                       {src.wordCount} words · depth {src.depth}
                     </span>
                   </a>

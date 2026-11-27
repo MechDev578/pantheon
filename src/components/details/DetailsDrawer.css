@@ -1,0 +1,652 @@
+.drawer {
+  position: relative;
+  height: 340px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--base);
+  border-top: 1px solid var(--line);
+  z-index: 10;
+}
+
+.drawer.is-minimized {
+  height: auto;
+}
+
+.drawer.is-resizing {
+  user-select: none;
+}
+
+.drawer.is-empty {
+  height: 44px;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+/* Grab the top edge to resize. The line lights up on hover. */
+.drawer__resize {
+  position: absolute;
+  top: -4px;
+  left: 0;
+  right: 0;
+  height: 8px;
+  z-index: 3;
+  cursor: row-resize;
+  touch-action: none;
+}
+
+.drawer__resize::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 3px;
+  height: 2px;
+  background: var(--line-3);
+  opacity: 0;
+  transition: opacity 0.15s var(--ease);
+}
+
+.drawer__resize:hover::after,
+.drawer__resize:focus-visible::after,
+.drawer.is-resizing .drawer__resize::after {
+  opacity: 1;
+}
+
+.drawer__resize:focus-visible {
+  outline: none;
+}
+
+.drawer.is-minimized .drawer__resize {
+  display: none;
+}
+
+.drawer__text-btn {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 13px;
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--line-3);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.drawer__text-btn:hover {
+  text-decoration-color: var(--text-2);
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+.drawer__head {
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px 0 16px;
+  white-space: nowrap;
+}
+
+.drawer:not(.is-minimized) .drawer__head {
+  border-bottom: 1px solid var(--line);
+}
+
+.drawer__name {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.drawer__meta {
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.drawer__summary {
+  margin-left: 8px;
+  font-size: 12px;
+  color: var(--text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.drawer__spacer {
+  flex: 1;
+}
+
+/* ── Body ─────────────────────────────────────────────────── */
+.drawer__body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 296px minmax(0, 1fr);
+}
+
+.drawer__side {
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 14px 8px 16px;
+  border-right: 1px solid var(--line);
+}
+
+.drawer__tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+}
+
+.drawer__epithet {
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.drawer__model {
+  padding: 1px 6px;
+  border-radius: 5px;
+  border: 1px solid var(--line-2);
+  background: var(--raised);
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.drawer__task {
+  margin: 0;
+  padding: 0 8px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text);
+  text-wrap: pretty;
+}
+
+.drawer__heading {
+  margin: 0 0 4px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.drawer__heading span {
+  margin-left: 4px;
+  font-weight: 400;
+}
+
+.drawer__none {
+  margin: 0;
+  padding: 0 8px;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.drawer__facts {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  row-gap: 6px;
+  margin: 0;
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+.drawer__facts dt {
+  color: var(--text-3);
+}
+
+.drawer__facts dd {
+  margin: 0;
+  color: var(--text-2);
+}
+
+/* ── Inline Sub-Bot Deploy Form ───────────────────────────── */
+.drawer__spawn-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 8px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line-2);
+  background: var(--raised);
+}
+
+.drawer__spawn-row {
+  display: flex;
+  gap: 6px;
+}
+
+.drawer__spawn-select,
+.drawer__spawn-input {
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 7px;
+  border: 1px solid var(--line-2);
+  background: var(--bg);
+  font-size: 12px;
+  color: var(--text);
+  outline: none;
+}
+
+.drawer__spawn-select {
+  flex: 1;
+}
+
+.drawer__spawn-input:focus,
+.drawer__spawn-select:focus {
+  border-color: var(--line-3);
+}
+
+.drawer__spawn-submit {
+  height: 30px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+/* ── Activity / Tabs pane ─────────────────────────────────── */
+.activity {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.activity__top {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  padding: 6px 12px 6px 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.drawer__tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.drawer__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: background-color 0.12s var(--ease), color 0.12s var(--ease);
+}
+
+.drawer__tab:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.drawer__tab.is-active {
+  background: var(--active);
+  color: var(--text);
+}
+
+.drawer__tab .mono {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.drawer__tab-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ok);
+}
+
+.activity__controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.activity__filters {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.activity__filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 7px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 12px;
+  color: var(--text-3);
+  cursor: pointer;
+  transition:
+    background-color 0.12s var(--ease),
+    color 0.12s var(--ease);
+}
+
+.activity__filter span {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.activity__filter:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.activity__filter.is-active {
+  background: var(--active);
+  color: var(--text);
+}
+
+.activity__search {
+  width: 170px;
+  height: 26px;
+}
+
+.activity__feed {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 6px 8px 12px;
+}
+
+.event {
+  display: grid;
+  grid-template-columns: 64px 44px minmax(0, 1fr) 28px;
+  column-gap: 12px;
+  align-items: baseline;
+  padding: 5px 0 5px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  transition: background-color 0.12s var(--ease);
+}
+
+.event:hover {
+  background: var(--hover);
+}
+
+.event__time {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.event__level {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.event--info .event__level {
+  color: var(--text-2);
+}
+
+.event--tool .event__level {
+  color: var(--run);
+}
+
+.event--thought .event__level {
+  color: var(--wait);
+}
+
+.event--warn .event__level {
+  color: var(--idle);
+}
+
+.event--success .event__level {
+  color: var(--ok);
+}
+
+.event--error .event__level,
+.event--error .event__message {
+  color: var(--err);
+}
+
+.event__message {
+  min-width: 0;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.event--debug .event__message,
+.event--tail .event__message {
+  color: var(--text-3);
+}
+
+.event--tail .event__level {
+  align-self: center;
+}
+
+.event__copy {
+  align-self: center;
+  width: 28px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.12s var(--ease),
+    color 0.12s var(--ease);
+}
+
+.event:hover .event__copy,
+.event__copy:focus-visible {
+  opacity: 1;
+}
+
+.event__copy:hover {
+  color: var(--text);
+}
+
+.event__copy svg {
+  width: 13px;
+  height: 13px;
+}
+
+.activity__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px 16px;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.activity__jump {
+  position: absolute;
+  right: 16px;
+  bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line-2);
+  background: var(--raised);
+  box-shadow: var(--pop-shadow);
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.activity__jump:hover {
+  background: var(--hover);
+}
+
+.activity__jump svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* ── Scraped Sources Tab ──────────────────────────────────── */
+.drawer__sources {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px;
+}
+
+.drawer__source-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+
+.drawer__source-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line-2);
+  background: var(--raised);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.14s var(--ease), background-color 0.14s var(--ease);
+}
+
+.drawer__source-card:hover {
+  background: var(--hover);
+  border-color: var(--line-3);
+}
+
+.drawer__source-card.is-error {
+  border-color: color-mix(in srgb, var(--err) 45%, var(--line-2));
+}
+
+.drawer__source-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.drawer__source-domain {
+  color: var(--run);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.drawer__source-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+
+.drawer__source-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.35;
+}
+
+.drawer__source-excerpt {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-3);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Output Tab ───────────────────────────────────────────── */
+.drawer__output {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.drawer__report-banner {
+  align-self: flex-start;
+}
+
+.drawer__output-pre {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 1240px) {
+  .drawer__summary {
+    display: none;
+  }
+}
+
+@media (max-width: 960px) {
+  .drawer__label,
+  .drawer__meta {
+    display: none;
+  }
+
+  .drawer__body {
+    grid-template-columns: minmax(0, 1fr);
+    overflow: auto;
+  }
+
+  .drawer__side {
+    overflow: visible;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .activity__feed,
+  .drawer__sources,
+  .drawer__output {
+    overflow: visible;
+  }
+
+  .activity__search {
+    flex: 1;
+    width: auto;
+  }
+
+  .drawer.is-empty {
+    justify-content: center;
+  }
+}

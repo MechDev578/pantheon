@@ -40,38 +40,48 @@ export function SettingsModal({
   };
 
   return (
-    <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="Pantheon Settings">
+    <div
+      className="modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Pantheon Settings"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="settings-modal">
         <div className="settings-header">
           <div className="settings-title-group">
-            <KeyRound size={17} className="settings-icon" />
+            <span className="settings-icon-wrap">
+              <KeyRound size={15} strokeWidth={1.7} />
+            </span>
             <div>
-              <h2 className="settings-title">Pantheon v2 Engine Settings</h2>
+              <h2 className="settings-title">Pantheon v2.2.1 settings</h2>
               <p className="settings-subtitle">
-                Choose your AI brain (Gemini, OpenAI, or Claude) and optional search keys.
+                Choose your AI provider (Gemini, OpenAI, or Claude) and optional search keys.
               </p>
             </div>
           </div>
           <button
             type="button"
-            className="modal-close-btn"
+            className="btn btn-ghost btn-icon"
             onClick={onClose}
             aria-label="Close settings"
           >
-            <X size={16} />
+            <X size={16} strokeWidth={1.6} />
           </button>
         </div>
 
-        <div className="settings-body">
+        <div className="settings-body scroll-quiet">
           <div className="settings-status-card">
-            <Server size={15} />
+            <Server size={15} strokeWidth={1.6} />
             <div className="status-card-text">
               <strong>
                 {capabilities?.runtime === 'local'
-                  ? 'Local Mac Engine Connected (Unlimited Runtime & Deep Crawl)'
+                  ? 'Local engine connected (unlimited runtime & deep crawl)'
                   : capabilities?.runtime === 'cloud'
-                    ? 'Netlify Cloud Engine Connected (Live Serverless Streaming)'
-                    : 'Offline / Demo Mode Only (Start with `npm run dev` locally or deploy to Netlify)'}
+                    ? 'Netlify cloud engine connected (live serverless streaming)'
+                    : 'Offline demo mode only (run `npm run dev` locally or deploy to Netlify)'}
               </strong>
               <span>
                 API keys entered below stay strictly in your browser&apos;s localStorage and are never committed to Git.
@@ -80,7 +90,7 @@ export function SettingsModal({
           </div>
 
           <div className="settings-field">
-            <label className="settings-label">AI Provider</label>
+            <label className="settings-label">AI provider</label>
             <div className="provider-grid">
               {(['gemini', 'openai', 'anthropic'] as const).map((prov) => {
                 const envReady = Boolean(capabilities?.configuredProviders[prov]);
@@ -132,12 +142,12 @@ export function SettingsModal({
 
             <div className="settings-field">
               <label className="settings-label" htmlFor="pantheon-model-custom">
-                Model ID Override
+                Model ID override
               </label>
               <input
                 id="pantheon-model-custom"
                 type="text"
-                className="settings-input"
+                className="settings-input mono"
                 value={settings.model}
                 onChange={(e) =>
                   onUpdateSettings((prev) => ({ ...prev, model: e.target.value }))
@@ -150,7 +160,7 @@ export function SettingsModal({
           <div className="settings-field">
             <div className="settings-label-row">
               <label className="settings-label" htmlFor="pantheon-api-key">
-                {activeProviderMeta.label} API Key
+                {activeProviderMeta.label} API key
               </label>
               {serverHasActiveKey && (
                 <span className="env-detected-pill">
@@ -163,7 +173,7 @@ export function SettingsModal({
               <input
                 id="pantheon-api-key"
                 type={showKey ? 'text' : 'password'}
-                className="settings-input"
+                className="settings-input mono"
                 value={settings.apiKeys[settings.provider]}
                 onChange={(e) =>
                   onUpdateSettings((prev) => ({
@@ -183,7 +193,7 @@ export function SettingsModal({
               />
               <button
                 type="button"
-                className="key-eye-btn"
+                className="btn btn-ghost btn-icon key-eye-btn"
                 onClick={() => setShowKey((v) => !v)}
                 aria-label={showKey ? 'Hide API key' : 'Show API key'}
               >
@@ -197,7 +207,7 @@ export function SettingsModal({
           <div className="settings-row">
             <div className="settings-field">
               <label className="settings-label" htmlFor="pantheon-search-provider">
-                <Search size={11} /> Web Search Engine
+                <Search size={11} /> Web search engine
               </label>
               <select
                 id="pantheon-search-provider"
@@ -219,12 +229,12 @@ export function SettingsModal({
 
             <div className="settings-field">
               <label className="settings-label" htmlFor="pantheon-search-key">
-                Optional Search API Key (Tavily / Brave)
+                Optional search API key (Tavily / Brave)
               </label>
               <input
                 id="pantheon-search-key"
                 type={showKey ? 'text' : 'password'}
-                className="settings-input"
+                className="settings-input mono"
                 value={settings.searchApiKey}
                 onChange={(e) =>
                   onUpdateSettings((prev) => ({ ...prev, searchApiKey: e.target.value }))
@@ -241,7 +251,7 @@ export function SettingsModal({
             <ShieldCheck size={13} />
             Keys remain local to your browser / .env file.
           </span>
-          <button type="button" className="settings-done-btn" onClick={onClose}>
+          <button type="button" className="btn btn-primary" onClick={onClose}>
             Done
           </button>
         </div>

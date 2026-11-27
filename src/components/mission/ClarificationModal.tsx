@@ -32,43 +32,51 @@ export function ClarificationModal({
   };
 
   return (
-    <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="Zeus Clarifying Questions">
+    <div
+      className="modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Zeus Clarifying Questions"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="clarify-modal">
         <div className="clarify-header">
           <div className="clarify-title-row">
             <span className="clarify-icon">
-              <Crown size={18} />
+              <Crown size={16} strokeWidth={1.7} />
             </span>
             <div>
-              <h2 className="clarify-title">Zeus Needs Quick Context</h2>
+              <h2 className="clarify-title">Zeus needs quick context</h2>
               <p className="clarify-subtitle">
-                Answer to sharpen the Pantheon's search & scraping — or skip to let Zeus assume defaults.
+                Answer to sharpen the Pantheon&apos;s search and scraping, or skip to let Zeus assume defaults.
               </p>
             </div>
           </div>
           <button
             type="button"
-            className="modal-close-btn"
+            className="btn btn-ghost btn-icon"
             onClick={onClose}
             aria-label="Minimize clarification modal"
           >
-            <X size={16} />
+            <X size={16} strokeWidth={1.6} />
           </button>
         </div>
 
         {mission.contextSummary && (
           <div className="clarify-context-brief">
-            <span className="clarify-brief-label">Understood Mission Scope</span>
+            <span className="clarify-brief-label">Understood mission scope</span>
             <p>{mission.contextSummary}</p>
           </div>
         )}
 
         <form className="clarify-form" onSubmit={handleSubmit}>
-          <div className="clarify-questions">
+          <div className="clarify-questions scroll-quiet">
             {mission.questions.map((q, idx) => (
               <div key={q.id} className="clarify-q-card">
                 <label className="clarify-q-label" htmlFor={`clarify-${q.id}`}>
-                  <span className="clarify-q-num">{idx + 1}</span>
+                  <span className="clarify-q-num mono">{idx + 1}</span>
                   <span>{q.question}</span>
                 </label>
                 {q.reason && <p className="clarify-q-reason">{q.reason}</p>}
@@ -107,7 +115,7 @@ export function ClarificationModal({
                       [q.id]: e.target.value,
                     }))
                   }
-                  placeholder="Type your answer (or pick a suggestion above)…"
+                  placeholder="Type your answer or pick a suggestion above…"
                 />
               </div>
             ))}
@@ -116,21 +124,21 @@ export function ClarificationModal({
           <div className="clarify-footer">
             <button
               type="button"
-              className="clarify-skip-btn"
+              className="btn btn-secondary"
               disabled={isSubmitting}
               onClick={() => onSubmit({}, true)}
             >
               <Brain size={14} />
-              <span>Skip — Assume Context & Deploy</span>
+              <span>Skip &amp; auto-assume</span>
             </button>
 
             <button
               type="submit"
-              className="clarify-submit-btn"
+              className="btn btn-primary"
               disabled={isSubmitting}
             >
               <Send size={14} />
-              <span>{isSubmitting ? 'Deploying Pantheon…' : 'Submit & Deploy Pantheon'}</span>
+              <span>{isSubmitting ? 'Deploying Pantheon…' : 'Submit & deploy'}</span>
             </button>
           </div>
         </form>

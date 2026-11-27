@@ -1,46 +1,36 @@
 .react-flow__edge-path.bot-edge-path {
   fill: none;
-  stroke-width: 1.75;
-  stroke-linecap: round;
-  transition: stroke 0.25s ease, opacity 0.25s ease;
+  stroke: var(--line-3);
+  stroke-width: 1;
+  transition: stroke 0.25s var(--ease), stroke-opacity 0.25s var(--ease);
 }
 
+/* Work flowing to a running agent. */
 .react-flow__edge-path.bot-edge-path--active {
-  stroke: var(--status-running);
-  stroke-width: 2;
-  stroke-dasharray: 6 5;
-  animation: bot-edge-flow 0.9s linear infinite;
-  filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.35));
+  stroke: var(--run);
+  stroke-opacity: 0.65;
+  stroke-dasharray: 3 5;
+  animation: bot-edge-flow 1.2s linear infinite;
 }
 
 .react-flow__edge-path.bot-edge-path--waiting {
-  stroke: var(--status-waiting);
-  stroke-width: 1.9;
-  stroke-dasharray: 5 5;
-  animation: bot-edge-flow 1.4s linear infinite;
-}
-
-.react-flow__edge-path.bot-edge-path--idle {
-  stroke: #475569;
-  stroke-dasharray: 3 3;
-  opacity: 0.75;
-}
-
-.react-flow__edge-path.bot-edge-path--done {
-  stroke: rgba(16, 185, 129, 0.45);
-  opacity: 0.85;
+  stroke: var(--wait);
+  stroke-opacity: 0.6;
+  stroke-dasharray: 2 4;
 }
 
 .react-flow__edge-path.bot-edge-path--error {
-  stroke: rgba(248, 113, 113, 0.6);
-  opacity: 0.9;
+  stroke: var(--err);
+  stroke-opacity: 0.7;
+}
+
+.is-paused .react-flow__edge-path.bot-edge-path--active {
+  animation-play-state: paused;
+  stroke-opacity: 0.3;
 }
 
 @keyframes bot-edge-flow {
-  from {
-    stroke-dashoffset: 22;
-  }
   to {
-    stroke-dashoffset: 0;
+    stroke-dashoffset: -8;
   }
 }

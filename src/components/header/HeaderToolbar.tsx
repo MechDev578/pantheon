@@ -1,16 +1,20 @@
 import {
   Cloud,
-  Crown,
+  Cpu,
   FileText,
-  Globe,
+  HelpCircle,
+  Moon,
+  PanelLeft,
   Pause,
   Play,
+  Plus,
+  Rocket,
   RotateCcw,
-  Server,
+  Search,
   Settings,
   Sparkles,
   Square,
-  Workflow,
+  Sun,
 } from 'lucide-react';
 import type { HeaderToolbarProps } from '../../types/bot';
 import './HeaderToolbar.css';
@@ -18,167 +22,223 @@ import './HeaderToolbar.css';
 export function HeaderToolbar({
   runtimeMode,
   detectedBackend,
+  activeMission,
   isBusy,
   isDemoSimulating,
+  elapsedLabel,
+  selectedBotName,
+  isSidebarOpen,
+  theme,
   hasReport,
   hasKeyReady,
-  stats,
+  onToggleSidebar,
+  onToggleTheme,
+  onOpenSearch,
   onSwitchRuntime,
   onToggleDemoSimulation,
+  onSpawnDemoBot,
+  onResetDemo,
+  onToggleLauncher,
+  onOpenClarification,
   onAbortMission,
   onOpenReport,
   onOpenSettings,
-  onAutoLayout,
-  onResetDemo,
 }: HeaderToolbarProps) {
-  const isDemo = runtimeMode === 'demo';
-  const liveLabel =
-    detectedBackend === 'local'
-      ? 'Local Engine'
-      : detectedBackend === 'cloud'
-        ? 'Netlify Cloud'
-        : 'Live';
+  const themeLabel = theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
+  const waitingForInput = runtimeMode !== 'demo' && activeMission?.status === 'waiting_for_input';
+
+  let statusLabel = 'Ready';
+  let dotState: 'ok' | 'run' | 'wait' | 'paused' | 'err' = 'ok';
+  if (runtimeMode === 'demo') {
+    statusLabel = isDemoSimulating ? 'Live' : 'Paused';
+    dotState = isDemoSimulating ? 'ok' : 'paused';
+  } else if (activeMission) {
+    if (activeMission.status === 'running' || activeMission.status === 'analyzing') {
+      statusLabel = activeMission.status === 'analyzing' ? 'Analyzing' : 'Running';
+      dotState = 'run';
+    } else if (activeMission.status === 'waiting_for_input') {
+      statusLabel = 'Awaiting input';
+      dotState = 'wait';
+    } else if (activeMission.status === 'failed' || activeMission.status === 'aborted') {
+      statusLabel = activeMission.status === 'failed' ? 'Failed' : 'Stopped';
+      dotState = 'err';
+    } else {
+      statusLabel = 'Completed';
+      dotState = 'ok';
+    }
+  }
 
   return (
-    <header className="header-toolbar">
-      <div className="header-brand">
-        <div className="header-logo" aria-hidden="true">
-          <Crown size={18} strokeWidth={2.1} />
-        </div>
-        <div className="header-title-group">
-          <h1 className="header-title">Pantheon</h1>
-          <span className="version-badge">v2</span>
+    <header className="topbar">
+      <div className="topbar__left">
+        <button
+          type="button"
+          className="btn btn-ghost btn-icon"
+          onClick={onToggleSidebar}
+          aria-label={isSidebarOpen ? 'Hide agent list' : 'Show agent list'}
+          aria-expanded={isSidebarOpen}
+          title="Agent list  ["
+        >
+          <PanelLeft strokeWidth={1.6} />
+        </button>
 
-          <div className="runtime-toggle" role="group" aria-label="Runtime mode">
-            {detectedBackend && (
-              <button
-                type="button"
-                className={`runtime-tab ${!isDemo ? 'is-active' : ''}`}
-                onClick={() => onSwitchRuntime(detectedBackend)}
-                title={
-                  detectedBackend === 'local'
-                    ? 'Connected to local Node.js Pantheon Engine (unlimited runtime)'
-                    : 'Connected to Netlify Cloud streaming engine'
-                }
-              >
-                {detectedBackend === 'local' ? <Server size={12} /> : <Cloud size={12} />}
-                <span>{liveLabel}</span>
-              </button>
-            )}
+        <h1 className="topbar__title">Pantheon</h1>
+        <span className="topbar__version mono">v2.2.1</span>
+
+        <div className="topbar__runtime" role="group" aria-label="Execution runtime">
+          {detectedBackend === 'local' && (
             <button
               type="button"
-              className={`runtime-tab ${isDemo ? 'is-active is-demo' : ''}`}
-              onClick={() => onSwitchRuntime('demo')}
-              title="Offline Greek mythology swarm simulator"
+              className={`runtime-seg ${runtimeMode === 'local' ? 'is-active' : ''}`}
+              onClick={() => onSwitchRuntime('local')}
+              title="Local Node.js Engine (unlimited crawl depth & mission persistence)"
             >
-              <Sparkles size={12} />
-              <span>Demo</span>
+              <Cpu size={13} strokeWidth={1.7} />
+              <span>Local</span>
             </button>
-          </div>
+          )}
+          {detectedBackend === 'cloud' && (
+            <button
+              type="button"
+              className={`runtime-seg ${runtimeMode === 'cloud' ? 'is-active' : ''}`}
+              onClick={() => onSwitchRuntime('cloud')}
+              title="Netlify Cloud Function (live serverless streaming)"
+            >
+              <Cloud size={13} strokeWidth={1.7} />
+              <span>Cloud</span>
+            </button>
+          )}
+          <button
+            type="button"
+            className={`runtime-seg ${runtimeMode === 'demo' ? 'is-active' : ''}`}
+            onClick={() => onSwitchRuntime('demo')}
+            title="Offline Greek mythology swarm simulation (no API key needed)"
+          >
+            <Sparkles size={13} strokeWidth={1.7} />
+            <span>Demo</span>
+          </button>
         </div>
       </div>
 
-      <div className="header-right">
-        <div className="header-stats" aria-label="Pantheon telemetry">
-          <div className="stat-pill stat-running" title="Active running Olympians">
-            <span className="stat-dot" aria-hidden="true" />
-            <span className="stat-label">Active</span>
-            <span className="stat-value">{stats.running}</span>
-          </div>
-          {stats.waiting > 0 && (
-            <div className="stat-pill stat-waiting" title="Bots waiting for input or sub-agents">
-              <span className="stat-dot" aria-hidden="true" />
-              <span className="stat-label">Waiting</span>
-              <span className="stat-value">{stats.waiting}</span>
-            </div>
+      <div className="topbar__right">
+        <span className="topbar__status" role="status">
+          <span className={`topbar__dot is-${dotState}`} aria-hidden="true" />
+          <span>{statusLabel}</span>
+          {(runtimeMode === 'demo' || activeMission !== null) && (
+            <span className="topbar__time mono" title="Elapsed time">
+              {elapsedLabel}
+            </span>
           )}
-          <div className="stat-pill stat-done" title="Completed Olympians">
-            <span className="stat-dot" aria-hidden="true" />
-            <span className="stat-label">Done</span>
-            <span className="stat-value">{stats.done}</span>
-          </div>
-          <div className="stat-pill stat-sources" title="Total web pages scraped across all bots">
-            <Globe size={12} className="stat-globe" />
-            <span className="stat-label">Scraped</span>
-            <span className="stat-value">{stats.sourcesScraped}</span>
-          </div>
-          <div className="stat-pill stat-total" title="Total bots deployed">
-            <span className="stat-label">Bots</span>
-            <span className="stat-value">{stats.total}</span>
-          </div>
-        </div>
+        </span>
 
-        <div className="header-divider" aria-hidden="true" />
-
-        <div className="header-actions">
-          {!isDemo && isBusy && (
-            <button
-              type="button"
-              className="toolbar-btn btn-danger"
-              onClick={onAbortMission}
-              title="Stop active mission immediately"
-            >
-              <Square size={13} />
-              <span>Stop</span>
-            </button>
-          )}
-
-          {!isDemo && hasReport && (
-            <button
-              type="button"
-              className="toolbar-btn btn-accent"
-              onClick={onOpenReport}
-              title="View Apollo's final synthesized mission report"
-            >
-              <FileText size={14} />
-              <span>Report</span>
-            </button>
-          )}
-
-          {isDemo && (
-            <>
-              <button
-                type="button"
-                className={`toolbar-btn ${isDemoSimulating ? 'btn-secondary' : 'btn-accent'}`}
-                onClick={onToggleDemoSimulation}
-                title={isDemoSimulating ? 'Pause demo simulation' : 'Resume demo simulation'}
-              >
-                {isDemoSimulating ? <Pause size={14} /> : <Play size={14} />}
-                <span>{isDemoSimulating ? 'Pause' : 'Resume'}</span>
-              </button>
-              <button
-                type="button"
-                className="toolbar-btn btn-ghost"
-                onClick={onResetDemo}
-                title="Reset demo graph"
-              >
-                <RotateCcw size={14} />
-                <span>Reset</span>
-              </button>
-            </>
-          )}
-
+        {waitingForInput && activeMission && (
           <button
             type="button"
-            className="toolbar-btn btn-secondary"
-            onClick={onAutoLayout}
-            title="Re-center hierarchical tree layout"
+            className="btn topbar__clarify"
+            onClick={onOpenClarification}
+            title="Answer Zeus's clarifying questions"
           >
-            <Workflow size={14} />
-            <span>Layout</span>
+            <HelpCircle strokeWidth={1.7} />
+            <span className="topbar__label">Answer Zeus ({activeMission.questions.length})</span>
           </button>
+        )}
 
+        {runtimeMode !== 'demo' && isBusy && (
           <button
             type="button"
-            className={`toolbar-btn ${hasKeyReady ? 'btn-secondary' : 'btn-primary'}`}
-            onClick={onOpenSettings}
-            title="Configure AI provider (Gemini / OpenAI / Claude), API keys, and depth defaults"
+            className="btn btn-danger"
+            onClick={onAbortMission}
+            title="Stop active mission"
           >
-            <Settings size={14} />
-            <span>Settings</span>
-            {!hasKeyReady && <span className="settings-alert-dot" aria-label="API key needed" />}
+            <Square strokeWidth={1.8} />
+            <span className="topbar__label">Stop</span>
           </button>
-        </div>
+        )}
+
+        {runtimeMode !== 'demo' && hasReport && (
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={onOpenReport}
+            title="Open Apollo's compiled mission report"
+          >
+            <FileText strokeWidth={1.6} />
+            <span className="topbar__label">Report</span>
+          </button>
+        )}
+
+        <button
+          type="button"
+          className="btn btn-ghost btn-icon"
+          onClick={onOpenSearch}
+          aria-label="Find an agent"
+          title="Find an agent  ⌘K"
+        >
+          <Search strokeWidth={1.6} />
+        </button>
+
+        <button
+          type="button"
+          className="btn btn-ghost btn-icon"
+          onClick={onToggleTheme}
+          aria-label={themeLabel}
+          title={themeLabel}
+        >
+          {theme === 'dark' ? <Sun strokeWidth={1.6} /> : <Moon strokeWidth={1.6} />}
+        </button>
+
+        <button
+          type="button"
+          className="btn btn-ghost btn-icon topbar__settings-btn"
+          onClick={onOpenSettings}
+          aria-label="Engine & API settings"
+          title={hasKeyReady ? 'Engine settings (API key ready)' : 'Configure AI provider & API key'}
+        >
+          <Settings strokeWidth={1.6} />
+          <span className={`topbar__key-dot ${hasKeyReady ? 'is-ready' : 'is-missing'}`} aria-hidden="true" />
+        </button>
+
+        {runtimeMode === 'demo' ? (
+          <>
+            <button
+              type="button"
+              className="btn btn-ghost btn-icon"
+              onClick={onResetDemo}
+              aria-label="Reset demo"
+              title="Reset to the starter Pantheon tree"
+            >
+              <RotateCcw strokeWidth={1.6} />
+            </button>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={onToggleDemoSimulation}
+              title={isDemoSimulating ? 'Pause simulation ticks' : 'Resume simulation ticks'}
+            >
+              {isDemoSimulating ? <Pause strokeWidth={1.6} /> : <Play strokeWidth={1.6} />}
+              <span className="topbar__label">{isDemoSimulating ? 'Pause' : 'Resume'}</span>
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={onSpawnDemoBot}
+              title={selectedBotName ? `New agent under ${selectedBotName}  (N)` : 'New agent  (N)'}
+            >
+              <Plus strokeWidth={2} />
+              <span className="topbar__label">New agent</span>
+            </button>
+          </>
+        ) : (
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={onToggleLauncher}
+            title="Deploy a new live mission  (N)"
+          >
+            <Rocket strokeWidth={1.8} />
+            <span className="topbar__label">New mission</span>
+          </button>
+        )}
       </div>
     </header>
   );
