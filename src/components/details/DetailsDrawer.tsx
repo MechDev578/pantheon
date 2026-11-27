@@ -85,6 +85,9 @@ export function DetailsDrawer({
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const feedRef = useRef<HTMLDivElement | null>(null);
   const programmaticScroll = useRef(false);
+  const resizeCleanupRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => () => resizeCleanupRef.current?.(), []);
 
   const botId = bot?.id ?? null;
   const logCount = bot?.logs.length ?? 0;
@@ -120,13 +123,19 @@ export function DetailsDrawer({
         latest = clampHeight(startHeight + (startY - moveEvent.clientY));
         setHeight(latest);
       };
-      const onUp = () => {
-        setIsResizing(false);
-        saveHeight(latest);
+      const cleanup = () => {
         window.removeEventListener('pointermove', onMove);
         window.removeEventListener('pointerup', onUp);
         window.removeEventListener('pointercancel', onUp);
+        resizeCleanupRef.current = null;
       };
+      const onUp = () => {
+        setIsResizing(false);
+        saveHeight(latest);
+        cleanup();
+      };
+      resizeCleanupRef.current?.();
+      resizeCleanupRef.current = cleanup;
       window.addEventListener('pointermove', onMove);
       window.addEventListener('pointerup', onUp);
       window.addEventListener('pointercancel', onUp);

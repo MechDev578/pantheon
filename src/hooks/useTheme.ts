@@ -3,9 +3,20 @@ import { useCallback, useEffect, useState } from 'react';
 export type Theme = 'dark' | 'light';
 
 const STORAGE_KEY = 'pantheon-theme';
+const THEME_COLORS: Record<Theme, string> = {
+  dark: '#0a0a0b',
+  light: '#ffffff',
+};
 
 function readDocumentTheme(): Theme {
   return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+}
+
+function syncMetaThemeColor(theme: Theme): void {
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) {
+    meta.setAttribute('content', THEME_COLORS[theme]);
+  }
 }
 
 /**
@@ -16,7 +27,12 @@ export function useTheme(): { theme: Theme; toggleTheme: () => void } {
   const [theme, setTheme] = useState<Theme>(readDocumentTheme);
 
   useEffect(() => {
-    const observer = new MutationObserver(() => setTheme(readDocumentTheme()));
+    syncMetaThemeColor(readDocumentTheme());
+    const observer = new MutationObserver(() => {
+      const current = readDocumentTheme();
+      setTheme(current);
+      syncMetaThemeColor(current);
+    });
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['data-theme'],
@@ -27,6 +43,7 @@ export function useTheme(): { theme: Theme; toggleTheme: () => void } {
   const toggleTheme = useCallback(() => {
     const next: Theme = readDocumentTheme() === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
+    syncMetaThemeColor(next);
     try {
       localStorage.setItem(STORAGE_KEY, next);
     } catch {

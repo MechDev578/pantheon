@@ -161,9 +161,14 @@ function BotGraphCanvasInner({
         const eased = 1 - Math.pow(1 - progress, 3);
         const frame: Record<string, XYPosition> = {};
         for (const bot of botList) {
-          const from = origins[bot.id];
-          const to = targets[bot.id];
-          frame[bot.id] = { x: from.x + (to.x - from.x) * eased, y: from.y + (to.y - from.y) * eased };
+          const pinned = pinnedPositionsRef.current[bot.id];
+          if (pinned) {
+            frame[bot.id] = pinned;
+          } else {
+            const from = origins[bot.id];
+            const to = targets[bot.id];
+            frame[bot.id] = { x: from.x + (to.x - from.x) * eased, y: from.y + (to.y - from.y) * eased };
+          }
         }
         displayedRef.current = frame;
         applyPositions(frame);
@@ -185,14 +190,21 @@ function BotGraphCanvasInner({
       }
     }
     setEdges(nextEdges);
-
-    if (layoutChanged) {
-      // Fit once the nodes have settled, so the camera frames the final layout.
-      const timeoutId = window.setTimeout(() => void fitView(FIT_OPTIONS), needsAnimation ? LAYOUT_ANIMATION_MS : 0);
-      return () => window.clearTimeout(timeoutId);
-    }
     return undefined;
-  }, [bots, rootId, selectedBotId, layoutVersion, setNodes, setEdges, fitView]);
+  }, [bots, rootId, selectedBotId, layoutVersion, setNodes, setEdges]);
+
+  // Refit the camera on explicit Tidy up / Reset without letting incoming live ticks cancel it.
+  useEffect(() => {
+    if (layoutVersion === 0) {
+      return undefined;
+    }
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const timeoutId = window.setTimeout(
+      () => void fitView(FIT_OPTIONS),
+      reduceMotion ? 0 : LAYOUT_ANIMATION_MS,
+    );
+    return () => window.clearTimeout(timeoutId);
+  }, [layoutVersion, fitView]);
 
   // "Center on map" from the details drawer.
   useEffect(() => {
