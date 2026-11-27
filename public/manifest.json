@@ -1,11 +1,11 @@
 {
-  "name": "Bot Mind Map",
-  "short_name": "Bot Mind Map",
+  "name": "Pantheon",
+  "short_name": "Pantheon",
   "description": "Live multi-agent orchestration node graph and log inspector.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0b0f17",
-  "theme_color": "#0b0f17",
+  "background_color": "#0a0a0b",
+  "theme_color": "#0a0a0b",
   "icons": [
     {
       "src": "/icon.svg",
