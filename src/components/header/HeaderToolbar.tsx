@@ -1,115 +1,75 @@
-import {
-  Cpu,
-  Pause,
-  Play,
-  Plus,
-  RotateCcw,
-  Workflow,
-} from 'lucide-react';
+import { Moon, PanelLeft, Pause, Play, Plus, RotateCcw, Search, Sun } from 'lucide-react';
 import type { HeaderToolbarProps } from '../../types/bot';
 import './HeaderToolbar.css';
 
 export function HeaderToolbar({
   isSimulating,
-  stats,
+  elapsedLabel,
   selectedBotName,
+  isSidebarOpen,
+  theme,
+  onToggleSidebar,
+  onToggleTheme,
+  onOpenSearch,
   onToggleSimulation,
   onSpawnBot,
   onReset,
-  onAutoLayout,
 }: HeaderToolbarProps) {
-  const spawnTitle = selectedBotName
-    ? `Spawn child bot under ${selectedBotName}`
-    : 'Spawn child bot under an active parent';
+  const themeLabel = theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
 
   return (
-    <header className="header-toolbar">
-      <div className="header-brand">
-        <div className="header-logo" aria-hidden="true">
-          <Cpu size={18} strokeWidth={2.1} />
-        </div>
-        <div className="header-title-group">
-          <h1 className="header-title">Bot Mind Map</h1>
-          <span
-            className={`sim-status-pill ${isSimulating ? 'is-live' : 'is-paused'}`}
-            title={
-              isSimulating
-                ? 'Simulation ticks active'
-                : 'Simulation paused'
-            }
-          >
-            <span className="sim-status-dot" aria-hidden="true" />
-            <span>{isSimulating ? 'Live' : 'Paused'}</span>
-          </span>
-        </div>
+    <header className="topbar">
+      <div className="topbar__left">
+        <button
+          type="button"
+          className="btn btn-ghost btn-icon"
+          onClick={onToggleSidebar}
+          aria-label={isSidebarOpen ? 'Hide agent list' : 'Show agent list'}
+          aria-expanded={isSidebarOpen}
+          title="Agent list  ["
+        >
+          <PanelLeft strokeWidth={1.6} />
+        </button>
+        <h1 className="topbar__title">Pantheon</h1>
+        <span className="topbar__crumb">Mind map</span>
       </div>
 
-      <div className="header-right">
-        <div className="header-stats" aria-label="Simulation statistics">
-          <div className="stat-pill stat-running" title="Currently running bots">
-            <span className="stat-dot" aria-hidden="true" />
-            <span className="stat-label">Running</span>
-            <span className="stat-value">{stats.running}</span>
-          </div>
-          <div className="stat-pill stat-idle" title="Idle bots waiting on subtasks">
-            <span className="stat-dot" aria-hidden="true" />
-            <span className="stat-label">Idle</span>
-            <span className="stat-value">{stats.idle}</span>
-          </div>
-          <div className="stat-pill stat-done" title="Completed bots">
-            <span className="stat-dot" aria-hidden="true" />
-            <span className="stat-label">Done</span>
-            <span className="stat-value">{stats.done}</span>
-          </div>
-          <div className="stat-pill stat-total" title="Total bots in graph">
-            <span className="stat-label">Total</span>
-            <span className="stat-value">{stats.total}</span>
-          </div>
-        </div>
+      <div className="topbar__right">
+        <span className="topbar__status" role="status">
+          <span className={`topbar__dot ${isSimulating ? '' : 'is-paused'}`} aria-hidden="true" />
+          {isSimulating ? 'Live' : 'Paused'}
+          <span className="topbar__time mono" title="Time since the run started">
+            {elapsedLabel}
+          </span>
+        </span>
 
-        <div className="header-divider" aria-hidden="true" />
-
-        <div className="header-actions">
-          <button
-            type="button"
-            className={`toolbar-btn ${isSimulating ? 'btn-secondary' : 'btn-accent'}`}
-            onClick={onToggleSimulation}
-            title={isSimulating ? 'Pause simulation' : 'Resume simulation'}
-          >
-            {isSimulating ? <Pause size={15} /> : <Play size={15} />}
-            <span>{isSimulating ? 'Pause' : 'Resume'}</span>
-          </button>
-
-          <button
-            type="button"
-            className="toolbar-btn btn-primary"
-            onClick={onSpawnBot}
-            title={spawnTitle}
-          >
-            <Plus size={15} />
-            <span>Spawn Bot</span>
-          </button>
-
-          <button
-            type="button"
-            className="toolbar-btn btn-secondary"
-            onClick={onAutoLayout}
-            title="Re-run hierarchical tree layout and fit view"
-          >
-            <Workflow size={15} />
-            <span>Auto-Layout</span>
-          </button>
-
-          <button
-            type="button"
-            className="toolbar-btn btn-ghost"
-            onClick={onReset}
-            title="Reset simulation to initial starter tree"
-          >
-            <RotateCcw size={15} />
-            <span>Reset</span>
-          </button>
-        </div>
+        <button type="button" className="btn btn-ghost btn-icon" onClick={onOpenSearch} aria-label="Find an agent" title="Find an agent  ⌘K">
+          <Search strokeWidth={1.6} />
+        </button>
+        <button type="button" className="btn btn-ghost btn-icon" onClick={onToggleTheme} aria-label={themeLabel} title={themeLabel}>
+          {theme === 'dark' ? <Sun strokeWidth={1.6} /> : <Moon strokeWidth={1.6} />}
+        </button>
+        <button type="button" className="btn btn-ghost btn-icon" onClick={onReset} aria-label="Reset run" title="Reset to the starter tree">
+          <RotateCcw strokeWidth={1.6} />
+        </button>
+        <button
+          type="button"
+          className="btn btn-ghost"
+          onClick={onToggleSimulation}
+          title={isSimulating ? 'Pause simulation ticks' : 'Resume simulation ticks'}
+        >
+          {isSimulating ? <Pause strokeWidth={1.6} /> : <Play strokeWidth={1.6} />}
+          <span className="topbar__label">{isSimulating ? 'Pause' : 'Resume'}</span>
+        </button>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={onSpawnBot}
+          title={selectedBotName ? `New agent under ${selectedBotName}  (N)` : 'New agent  (N)'}
+        >
+          <Plus strokeWidth={2} />
+          <span className="topbar__label">New agent</span>
+        </button>
       </div>
     </header>
   );
