@@ -1,9 +1,9 @@
 import type { BotEntity } from '../types/bot';
 
-export const NODE_WIDTH = 264;
-export const NODE_HEIGHT = 122;
-export const H_GAP = 44;
-export const V_GAP = 86;
+export const NODE_WIDTH = 184;
+export const NODE_HEIGHT = 52;
+export const H_GAP = 24;
+export const V_GAP = 44;
 
 export interface TreePoint {
   x: number;

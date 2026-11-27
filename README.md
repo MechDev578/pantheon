@@ -88,7 +88,7 @@ pantheon/
 │   └── manifest.json             # PWA manifest
 ├── src/
 │   ├── main.tsx                  # Entry point + MCP App host bridge init
-│   ├── index.css                 # Dark observability theme tokens & React Flow overrides
+│   ├── index.css                 # Dark and light theme tokens, shared controls
 │   ├── App.tsx / App.css         # Root layout shell & state wiring
 │   ├── types/bot.ts              # Shared TypeScript contracts
 │   ├── engine/mockOrchestrator.ts# Pure simulation tick engine & manual spawning
@@ -97,9 +97,11 @@ pantheon/
 │   │   ├── treeLayout.ts         # Deterministic recursive subtree-width TB layout
 │   │   └── mcpAppBridge.ts       # @modelcontextprotocol/ext-apps host bridge
 │   └── components/
-│       ├── graph/                # BotGraphCanvas, BotNode, BotEdge
-│       ├── header/               # HeaderToolbar (live badge, stats, controls)
-│       └── inspector/            # LogInspectorPanel (metadata, links, live logs)
+│       ├── common/               # StatusIcon, role icons
+│       ├── details/              # DetailsDrawer (task, lineage, activity; resizable)
+│       ├── graph/                # BotGraphCanvas, BotNode, BotEdge, map toolbar
+│       ├── header/               # HeaderToolbar (run status, theme, run controls)
+│       └── sidebar/              # AgentSidebar (filterable agent tree)
 ├── index.html
 ├── netlify.toml                  # Netlify build & SPA redirect config
 ├── package.json

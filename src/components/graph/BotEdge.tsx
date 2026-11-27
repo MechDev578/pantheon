@@ -26,7 +26,7 @@ export function BotEdge({
     targetX,
     targetY,
     targetPosition,
-    borderRadius: 12,
+    borderRadius: 8,
   });
 
   const targetStatus: BotStatus = data?.targetStatus ?? 'idle';

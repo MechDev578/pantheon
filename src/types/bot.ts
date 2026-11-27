@@ -1,3 +1,5 @@
+import type { RefObject } from 'react';
+
 export type BotStatus = 'running' | 'idle' | 'done';
 
 export type LogLevel = 'info' | 'warn' | 'success' | 'debug';
@@ -68,23 +70,44 @@ export interface BotGraphCanvasProps {
   rootId: string;
   selectedBotId: string | null;
   layoutVersion: number;
+  /** Bumped to pan the map to the selected agent. */
+  focusRequest: number;
   onSelectBot: (botId: string | null) => void;
+  onAutoLayout: () => void;
 }
 
 export interface HeaderToolbarProps {
   isSimulating: boolean;
-  stats: SimulationStats;
+  elapsedLabel: string;
   selectedBotName: string | null;
+  isSidebarOpen: boolean;
+  theme: 'dark' | 'light';
+  onToggleSidebar: () => void;
+  onToggleTheme: () => void;
+  onOpenSearch: () => void;
   onToggleSimulation: () => void;
   onSpawnBot: () => void;
   onReset: () => void;
-  onAutoLayout: () => void;
 }
 
-export interface LogInspectorPanelProps {
+export interface AgentSidebarProps {
+  bots: Record<string, BotEntity>;
+  rootId: string;
+  selectedBotId: string | null;
+  stats: SimulationStats;
+  isOpen: boolean;
+  filterInputRef: RefObject<HTMLInputElement>;
+  onSelectBot: (botId: string) => void;
+  onClose: () => void;
+}
+
+export interface DetailsDrawerProps {
   bot: BotEntity | null;
-  parentBot: BotEntity | null;
-  childBots: BotEntity[];
+  bots: Record<string, BotEntity>;
+  rootId: string;
+  now: number;
+  isSimulating: boolean;
   onSelectBot: (botId: string | null) => void;
   onSpawnChild: (parentId: string) => void;
+  onCenterOnMap: () => void;
 }
