@@ -44,7 +44,7 @@ export default async (req: Request, _context: Context) => {
   if (req.method === 'GET' && (subpath === 'health' || subpath === '')) {
     const caps: ServerCapabilities = {
       runtime: 'cloud',
-      version: '2.0.0',
+      version: '2.2.1',
       configuredProviders: {
         gemini: Boolean(getEnv('GEMINI_API_KEY')),
         openai: Boolean(getEnv('OPENAI_API_KEY')),

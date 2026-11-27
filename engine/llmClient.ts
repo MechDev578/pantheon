@@ -104,8 +104,9 @@ function toGeminiSchema(schema: unknown): unknown {
 }
 
 async function callGemini(params: LLMCallParams): Promise<LLMResponse> {
+  const cleanModel = params.model.trim().replace(/^models\//i, '');
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
-    params.model,
+    cleanModel,
   )}:generateContent?key=${encodeURIComponent(params.apiKey)}`;
 
   const contents: Array<{ role: 'user' | 'model'; parts: unknown[] }> = [];

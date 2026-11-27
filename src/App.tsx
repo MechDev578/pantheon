@@ -1,15 +1,29 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AlertCircle, X } from 'lucide-react';
+import { DetailsDrawer } from './components/details/DetailsDrawer';
 import { BotGraphCanvas } from './components/graph/BotGraphCanvas';
 import { HeaderToolbar } from './components/header/HeaderToolbar';
-import { LogInspectorPanel } from './components/inspector/LogInspectorPanel';
 import { ClarificationModal } from './components/mission/ClarificationModal';
 import { MissionLauncher } from './components/mission/MissionLauncher';
 import { MissionReportModal } from './components/mission/MissionReportModal';
 import { SettingsModal } from './components/settings/SettingsModal';
+import { AgentSidebar } from './components/sidebar/AgentSidebar';
+import { useNow } from './hooks/useNow';
 import { usePantheon } from './hooks/usePantheon';
-import type { BotEntity } from './types/bot';
+import { useTheme } from './hooks/useTheme';
+import { formatElapsed } from './utils/format';
+import { isTypingTarget } from './utils/keyboard';
 import './App.css';
+
+const SIDEBAR_KEY = 'pantheon-sidebar-open';
+
+function readSidebarPreference(): boolean {
+  try {
+    return localStorage.getItem(SIDEBAR_KEY) !== 'false';
+  } catch {
+    return true;
+  }
+}
 
 export function App() {
   const {
@@ -18,6 +32,7 @@ export function App() {
     capabilities,
     runtimeMode,
     switchRuntime,
+    showingLiveMission,
     activeMission,
     missionHistory,
     bots,
@@ -44,11 +59,28 @@ export function App() {
     spawnChildBot,
   } = usePantheon();
 
+  const { theme, toggleTheme } = useTheme();
+  const isActiveRun = runtimeMode === 'demo' ? isDemoSimulating : isMissionActive || isDeploying;
+  const now = useNow(isActiveRun);
+
+  const [isSidebarOpen, setIsSidebarOpen] = useState(readSidebarPreference);
+  const [launcherExpanded, setLauncherExpanded] = useState(false);
+  const [focusRequest, setFocusRequest] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [clarifyOpen, setClarifyOpen] = useState(false);
 
-  // Auto-open Zeus's Clarification Modal whenever a mission enters waiting_for_input
+  const filterInputRef = useRef<HTMLInputElement>(null);
+  const launcherInputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Collapse MissionLauncher when switching back to Demo mode so the map stays unobstructed.
+  useEffect(() => {
+    if (runtimeMode === 'demo') {
+      setLauncherExpanded(false);
+    }
+  }, [runtimeMode]);
+
+  // Auto-open Zeus's Clarification Modal whenever a mission enters waiting_for_input.
   useEffect(() => {
     if (
       activeMission?.status === 'waiting_for_input' &&
@@ -60,34 +92,138 @@ export function App() {
     }
   }, [activeMission?.id, activeMission?.status, activeMission?.questions.length]);
 
-  const parentBot: BotEntity | null =
-    selectedBot?.parentId ? (bots[selectedBot.parentId] ?? null) : null;
+  const toggleSidebar = useCallback(() => {
+    setIsSidebarOpen((open) => {
+      const next = !open;
+      try {
+        localStorage.setItem(SIDEBAR_KEY, String(next));
+      } catch {
+        // Preference just won't persist.
+      }
+      return next;
+    });
+  }, []);
 
-  const childBots: BotEntity[] =
-    selectedBot?.childIds
-      .map((id) => bots[id])
-      .filter((child): child is BotEntity => Boolean(child)) ?? [];
+  const openSearch = useCallback(() => {
+    setIsSidebarOpen(true);
+    requestAnimationFrame(() => filterInputRef.current?.focus());
+  }, []);
+
+  const openLauncher = useCallback(() => {
+    setLauncherExpanded(true);
+    requestAnimationFrame(() => launcherInputRef.current?.focus());
+  }, []);
+
+  const toggleLauncher = useCallback(() => {
+    setLauncherExpanded((prev) => {
+      const next = !prev;
+      if (next) {
+        requestAnimationFrame(() => launcherInputRef.current?.focus());
+      }
+      return next;
+    });
+  }, []);
+
+  const spawnDemoFromToolbar = useCallback(
+    () => void spawnChildBot(selectedBotId ?? rootId),
+    [spawnChildBot, selectedBotId, rootId],
+  );
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        openSearch();
+        return;
+      }
+      if (event.metaKey || event.ctrlKey || event.altKey || isTypingTarget(event.target)) {
+        if (event.key === 'Escape' && isTypingTarget(event.target)) {
+          (event.target as HTMLElement).blur();
+        }
+        return;
+      }
+      if (event.key === '[') {
+        event.preventDefault();
+        toggleSidebar();
+      } else if (event.key === 'Escape') {
+        if (settingsOpen) {
+          setSettingsOpen(false);
+        } else if (reportOpen) {
+          setReportOpen(false);
+        } else if (clarifyOpen) {
+          setClarifyOpen(false);
+        } else if (launcherExpanded) {
+          setLauncherExpanded(false);
+        } else {
+          selectBot(null);
+        }
+      } else if (event.key.toLowerCase() === 'n') {
+        event.preventDefault();
+        if (runtimeMode === 'demo') {
+          spawnDemoFromToolbar();
+        } else {
+          openLauncher();
+        }
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [
+    openSearch,
+    toggleSidebar,
+    selectBot,
+    spawnDemoFromToolbar,
+    openLauncher,
+    runtimeMode,
+    settingsOpen,
+    reportOpen,
+    clarifyOpen,
+    launcherExpanded,
+  ]);
+
+  const root = bots[rootId];
+  const elapsedMs = (() => {
+    if (showingLiveMission && activeMission) {
+      const endMs = activeMission.completedAt
+        ? new Date(activeMission.completedAt).getTime()
+        : isMissionActive || isDeploying
+          ? now
+          : new Date(activeMission.updatedAt).getTime();
+      return Math.max(0, endMs - new Date(activeMission.createdAt).getTime());
+    }
+    return root ? Math.max(0, now - new Date(root.createdAt).getTime()) : 0;
+  })();
+  const elapsedLabel = formatElapsed(elapsedMs);
 
   const canSpawnChild =
     runtimeMode === 'demo' || (runtimeMode === 'local' && activeMission !== null);
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${isActiveRun ? '' : 'is-paused'}`}>
       <HeaderToolbar
         runtimeMode={runtimeMode}
         detectedBackend={capabilities?.runtime ?? null}
+        activeMission={activeMission}
         isBusy={isMissionActive || isDeploying}
         isDemoSimulating={isDemoSimulating}
+        elapsedLabel={elapsedLabel}
+        selectedBotName={selectedBot?.name ?? null}
+        isSidebarOpen={isSidebarOpen}
+        theme={theme}
         hasReport={Boolean(activeMission?.finalReport)}
         hasKeyReady={hasKeyReady}
-        stats={stats}
+        onToggleSidebar={toggleSidebar}
+        onToggleTheme={toggleTheme}
+        onOpenSearch={openSearch}
         onSwitchRuntime={switchRuntime}
         onToggleDemoSimulation={toggleDemoSimulation}
-        onAbortMission={abortMission}
+        onSpawnDemoBot={spawnDemoFromToolbar}
+        onResetDemo={resetDemo}
+        onToggleLauncher={toggleLauncher}
+        onOpenClarification={() => setClarifyOpen(true)}
+        onAbortMission={() => void abortMission()}
         onOpenReport={() => setReportOpen(true)}
         onOpenSettings={() => setSettingsOpen(true)}
-        onAutoLayout={triggerAutoLayout}
-        onResetDemo={resetDemo}
       />
 
       {bannerError && (
@@ -96,7 +232,7 @@ export function App() {
           <span>{bannerError}</span>
           <button
             type="button"
-            className="app-error-close"
+            className="btn btn-ghost btn-icon app-error-close"
             onClick={clearBannerError}
             aria-label="Dismiss error"
           >
@@ -105,44 +241,75 @@ export function App() {
         </div>
       )}
 
-      <main className="app-workspace">
-        <div className="canvas-pane">
-          <MissionLauncher
-            defaultContextMode={settings.defaultContextMode}
-            defaultDepth={settings.defaultDepth}
-            isDeploying={isDeploying}
-            isBusy={isMissionActive}
-            hasKeyReady={hasKeyReady}
-            hasBackend={Boolean(capabilities)}
-            activeMission={activeMission}
-            missionHistory={missionHistory}
-            onDeploy={deployMission}
-            onSelectMission={selectMission}
-            onDeleteMission={deleteMission}
-            onOpenSettings={() => setSettingsOpen(true)}
-            onOpenClarification={() => setClarifyOpen(true)}
-          />
+      <div className="app-body">
+        <AgentSidebar
+          bots={bots}
+          rootId={rootId}
+          selectedBotId={selectedBotId}
+          stats={stats}
+          isOpen={isSidebarOpen}
+          filterInputRef={filterInputRef}
+          missionHistory={missionHistory}
+          activeMissionId={activeMission?.id ?? null}
+          onSelectBot={selectBot}
+          onSelectMission={(id) => {
+            void selectMission(id);
+            setLauncherExpanded(false);
+          }}
+          onDeleteMission={(id) => void deleteMission(id)}
+          onClose={toggleSidebar}
+        />
 
-          <BotGraphCanvas
+        <main className="app-main">
+          <div className="app-canvas">
+            <MissionLauncher
+              defaultContextMode={settings.defaultContextMode}
+              defaultDepth={settings.defaultDepth}
+              isExpanded={launcherExpanded}
+              onSetExpanded={setLauncherExpanded}
+              inputRef={launcherInputRef}
+              isDeploying={isDeploying}
+              isBusy={isMissionActive}
+              hasKeyReady={hasKeyReady}
+              hasBackend={Boolean(capabilities)}
+              activeMission={activeMission}
+              missionHistory={missionHistory}
+              onDeploy={deployMission}
+              onSelectMission={(id) => {
+                void selectMission(id);
+              }}
+              onDeleteMission={(id) => void deleteMission(id)}
+              onOpenSettings={() => setSettingsOpen(true)}
+              onOpenClarification={() => setClarifyOpen(true)}
+            />
+
+            <BotGraphCanvas
+              bots={bots}
+              rootId={rootId}
+              selectedBotId={selectedBotId}
+              layoutVersion={layoutVersion}
+              focusRequest={focusRequest}
+              onSelectBot={selectBot}
+              onAutoLayout={triggerAutoLayout}
+            />
+          </div>
+
+          <DetailsDrawer
+            bot={selectedBot}
             bots={bots}
             rootId={rootId}
-            selectedBotId={selectedBotId}
-            layoutVersion={layoutVersion}
+            now={now}
+            isActiveRun={isActiveRun}
+            runtimeMode={runtimeMode}
+            canSpawnLiveChild={canSpawnChild}
+            hasMissionReport={Boolean(activeMission?.finalReport)}
             onSelectBot={selectBot}
+            onSpawnChild={(parentId, role, task) => void spawnChildBot(parentId, role, task)}
+            onCenterOnMap={() => setFocusRequest((count) => count + 1)}
+            onOpenReport={() => setReportOpen(true)}
           />
-        </div>
-
-        <LogInspectorPanel
-          bot={selectedBot}
-          parentBot={parentBot}
-          childBots={childBots}
-          canSpawnLiveChild={canSpawnChild}
-          hasMissionReport={Boolean(activeMission?.finalReport)}
-          onSelectBot={selectBot}
-          onSpawnChild={spawnChildBot}
-          onOpenReport={() => setReportOpen(true)}
-        />
-      </main>
+        </main>
+      </div>
 
       {activeMission && (
         <ClarificationModal

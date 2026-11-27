@@ -1,7 +1,7 @@
 {
   "name": "bot-mind-map",
   "private": true,
-  "version": "2.0.0",
+  "version": "2.2.1",
   "type": "module",
   "scripts": {
     "dev": "concurrently -k -n ENGINE,UI -c cyan,magenta \"npm run server\" \"npm run dev:ui\"",

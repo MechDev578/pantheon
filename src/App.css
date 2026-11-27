@@ -4,55 +4,64 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background-color: var(--bg-canvas);
-  color: var(--text-primary);
+  background: var(--bg);
+  color: var(--text);
 }
 
 .app-error-banner {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 8px 16px;
-  background: rgba(248, 113, 113, 0.14);
-  border-bottom: 1px solid rgba(248, 113, 113, 0.4);
-  color: #fecaca;
-  font-size: 12.5px;
-  flex-shrink: 0;
-  z-index: 22;
+  gap: 8px;
+  padding: 7px 14px;
+  background: var(--err-bg);
+  border-bottom: 1px solid color-mix(in srgb, var(--err) 35%, transparent);
+  color: var(--err-text);
+  font-size: 13px;
 }
 
 .app-error-banner span {
   flex: 1;
+  min-width: 0;
 }
 
 .app-error-close {
+  color: var(--err-text);
   width: 24px;
   height: 24px;
-  border-radius: 6px;
-  border: none;
-  background: transparent;
-  color: #fecaca;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
 }
 
-.app-error-close:hover {
-  background: rgba(248, 113, 113, 0.22);
-}
-
-.app-workspace {
+.app-body {
   flex: 1;
-  display: flex;
   min-height: 0;
-  min-width: 0;
-  position: relative;
+  display: flex;
 }
 
-.canvas-pane {
+.app-main {
   flex: 1;
   min-width: 0;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-canvas {
   position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+@media (max-width: 700px) {
+  .app-shell {
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
+  }
+
+  .app-body {
+    flex-direction: column;
+  }
+
+  .app-canvas {
+    min-height: 420px;
+  }
 }

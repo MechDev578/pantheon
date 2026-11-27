@@ -198,8 +198,8 @@ export const PROVIDER_MODELS: Record<
 > = {
   gemini: {
     label: 'Google Gemini',
-    defaultModel: 'gemini-2.5-flash',
-    models: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash'],
+    defaultModel: 'gemini-3.8-flash',
+    models: ['gemini-3.8-flash', 'gemini-3.8-pro', 'gemini-2.5-pro'],
     keyPlaceholder: 'AIza...',
   },
   openai: {

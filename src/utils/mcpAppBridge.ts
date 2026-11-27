@@ -21,7 +21,7 @@ export function connectMcpAppHostIfEmbedded(): void {
   }
 
   connected = true;
-  const app = new App({ name: 'Bot Mind Map', version: '0.1.0' }, {});
+  const app = new App({ name: 'Pantheon', version: '2.2.1' }, {});
 
   app.ontoolinput = () => {};
   app.ontoolresult = () => {};

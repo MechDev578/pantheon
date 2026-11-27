@@ -1,12 +1,12 @@
-# Pantheon v2: The Bot Overlord
+# Pantheon `v2.2.1`: The Bot Overlord
 
-![Version](https://img.shields.io/badge/version-v2.0.0-fbbf24?style=flat-square)
-![Providers](https://img.shields.io/badge/AI-Gemini_%7C_OpenAI_%7C_Claude-22d3ee?style=flat-square)
+![Version](https://img.shields.io/badge/version-v2.2.1-fbbf24?style=flat-square)
+![Providers](https://img.shields.io/badge/AI-Gemini_3.8_%7C_OpenAI_%7C_Claude-22d3ee?style=flat-square)
 ![Runtime](https://img.shields.io/badge/Runtime-Local_Engine_%2B_Netlify_Cloud-a78bfa?style=flat-square)
+![Theme](https://img.shields.io/badge/UI-Graphite_Dark_%26_Light-6e6e76?style=flat-square)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178c6?style=flat-square&logo=typescript&logoColor=white)
-![React Flow](https://img.shields.io/badge/React_Flow-v12-ff0072?style=flat-square)
 
-**Pantheon v2** is a real, live multi-agent **Bot Manager & Deep Web Research Control Plane** inspired by Greek Mythology. Deploy any mission to **Zeus**, choose whether Zeus pauses to clarify missing context (**Ask First**) or infers smart defaults autonomously (**Auto-Assume**), and watch a live Olympian swarm (**Athena**, **Artemis**, **Hermes**, **Iris**, **Themis**, **Apollo**, and more) spawn in parallel, search the web, recursively deep-crawl websites, and compile cited Markdown reports on an interactive Mind Map.
+**Pantheon `v2.2.1`** combines **`v1.2`'s Graphite UI** (neutral dark & light themes, collapsible agent tree sidebar, smooth 420ms animated mind map, full-width resizable details drawer, keyboard shortcuts) with **Pantheon v2's real multi-agent orchestration engine**. Deploy any mission to **Zeus**, choose whether Zeus pauses to clarify missing context (**Ask First**) or infers smart defaults autonomously (**Auto-Assume**), and watch a live Greek mythology Olympian swarm (**Athena**, **Artemis**, **Hermes**, **Iris**, **Themis**, **Apollo**, and more) search the web, recursively deep-crawl websites, and compile cited Markdown reports in real time.
 
 ---
 
@@ -14,9 +14,22 @@
 
 | Version | Branch | Status | Summary |
 | :--- | :--- | :--- | :--- |
-| **v1.0.0** | [`main`](https://github.com/MechDev578/pantheon/tree/main) | Stable | Pure frontend Bot Mind Map visualizer (offline mock simulator, Netlify web app, macOS `.app`, MCP App) |
-| **v2.0.0** *(current)* | [`v2`](https://github.com/MechDev578/pantheon/tree/v2) | Active | Real multi-provider AI orchestration engine, Ask-First vs. Auto-Assume context modes, live web search & recursive website deep-crawling, Greek mythology bot personas, Local Engine + Netlify Cloud |
+| **v1.0.0** | Tag `v1.0.0` | Archive | Initial Bot Mind Map visualizer prototype |
+| **v1.2.0** | [`main`](https://github.com/MechDev578/pantheon/tree/main) | Stable | Graphite UI redesign (#1): neutral dark & light themes, collapsible agent tree sidebar, compact smooth-animated nodes, resizable bottom details drawer, keyboard shortcuts |
+| **v2.2.1** *(current)* | [`v2`](https://github.com/MechDev578/pantheon/tree/v2) | Active | Built over `v1.2` Graphite UI: real Gemini 3.8 / OpenAI / Claude orchestration engine, Ask-First vs. Auto-Assume context modes, recursive deep web scraper, Greek mythology Olympian swarm, Local Engine + Netlify Cloud |
 | **v3.0.0** | *Planned* | Roadmap | Action-capable bots with human-in-the-loop approvals — hotel & restaurant bookings, automated trip reservations, landlord email outreach, calendar sync, and external OAuth integrations |
+
+---
+
+## What's New in `v2.2.1`
+
+- **Built Over `v1.2` Graphite UI:**
+  - **Neutral Dark & Light Themes:** Role-token color system synced on `<html data-theme>` with zero flash on load and full contrast across all cards, modals, logs, and status icons.
+  - **Collapsible Pantheon Sidebar:** Indented Greek deity hierarchy mirroring the map, instant filter (`⌘K` / `Ctrl+K`), collapsible **Saved Missions** switcher, and proportional status/pages bar.
+  - **Smooth Animated Mind Map:** Compact `208×56` Olympian cards with shape-coded accessible status glyphs (`running`, `waiting`, `idle`, `done`, `error`), live active-tool ticker, scraped-page counter, smooth 420ms layout easing, parent-origin spawn animation, drag-safe merging, and floating top-right **Tidy up / Zoom / Fit** toolbar.
+  - **Resizable Bottom Details Drawer:** Drag the top edge (or `ArrowUp`/`ArrowDown`, double-click to reset), inspect directive/lineage/model, deploy follow-up sub-bots inline, and switch between **Activity** (searchable + level-filtered `Tools`/`Mind`/`Info`/`Warn`/`OK`/`Err` with copy-on-hover and smart `Latest` follow), **Sources** (clickable scraped website cards), and **Output** (findings + Apollo Full Report modal).
+  - **Keyboard Shortcuts:** `[` Toggle sidebar · `⌘K` / `Ctrl+K` Find deity · `F` Fit map · `N` New mission / agent · `Esc` Close modal or clear selection.
+- **Updated Gemini 3.8 Default:** Migrated default Gemini model to `gemini-3.8-flash` (with `gemini-3.8-pro` and `gemini-2.5-pro` options) and automatic migration for saved browser settings.
 
 ---
 
@@ -34,14 +47,14 @@ flowchart TD
     AR -->|"Spawns Child Crawlers"| IR["Iris / Odysseus (Sub-Scrapers)"]
     HE -->|"Fact-Check Handoff"| TH["Themis (Reviewer)"]
     AT & AR & HE & IR & TH --> AP["Apollo (Synthesizer) — Cited Markdown Report"]
-    AP --> UI["Live React Flow Mind Map + 3-Tab Inspector (Logs · Sources · Output)"]
+    AP --> UI["Graphite UI: Sidebar + Smooth Mind Map + 3-Tab Resizable Details Drawer"]
 ```
 
 ---
 
 ## Greek Mythology Pantheon Roster
 
-When missions scale up to 20 bots, Pantheon automatically assigns unique Greek mythological identities from its primary and secondary deity rosters ([`engine/pantheonRoster.ts`](engine/pantheonRoster.ts)):
+When missions scale up to 20 bots, Pantheon assigns unique Greek mythological identities from its primary and secondary deity rosters ([`engine/pantheonRoster.ts`](engine/pantheonRoster.ts)):
 
 | Primary Deity | Epithet | Role | Core Specialty |
 | :--- | :--- | :--- | :--- |
@@ -62,7 +75,7 @@ When missions scale up to 20 bots, Pantheon automatically assigns unique Greek m
 ## Core Capabilities
 
 ### 1. Context Strategy Toggle (`Ask First` vs. `Auto-Assume`)
-- **Ask First (`ask`):** Zeus evaluates your goal before deploying bots. If key constraints are missing (budget, dates, location, audience, depth), Zeus enters `waiting` state and surfaces 2–4 targeted questions with clickable suggested chips + custom text inputs (plus a 1-click **Skip — Assume Context & Deploy** override).
+- **Ask First (`ask`):** Zeus evaluates your goal before deploying bots. If key constraints are missing (budget, dates, location, audience, depth), Zeus enters `waiting` state and surfaces 2–4 targeted questions with clickable suggested chips + custom text inputs (plus a 1-click **Skip & auto-assume** override).
 - **Auto-Assume (`auto`):** Zeus infers sensible defaults, records every assumption transparently in both the telemetry log and final report, and deploys the swarm immediately.
 
 ### 2. Crawl & Swarm Depth Presets
@@ -80,18 +93,9 @@ When missions scale up to 20 bots, Pantheon automatically assigns unique Greek m
 
 ### 4. Multi-Provider AI Brain
 Bring your own API key for any supported provider (configured via local `.env` or the UI **Settings** modal):
-- **Google Gemini** (`gemini-2.5-flash`, `gemini-2.5-pro`, `gemini-2.0-flash`, or custom model ID)
+- **Google Gemini** (`gemini-3.8-flash`, `gemini-3.8-pro`, `gemini-2.5-pro`, or custom model ID)
 - **OpenAI** (`gpt-4o-mini`, `gpt-4o`, `gpt-4.1-mini`, `gpt-4.1`, `o3-mini`, or custom model ID)
 - **Anthropic Claude** (`claude-3-5-haiku-latest`, `claude-sonnet-4-20250514`, `claude-3-7-sonnet-latest`, or custom model ID)
-
-### 5. Interactive Live Mind Map & 3-Tab Inspector
-- Real-time node cards show each deity's **active tool ticker** (`Deep crawling...`, `Searching...`, `Awaiting Hermes`), **scraped websites count**, **child bots count**, and **log count**.
-- Click any node to open the **3-Tab Inspector**:
-  1. **Logs:** Streaming color-coded telemetry (`INFO`, `TOOL`, `MIND`, `WARN`, `OK`, `ERR`).
-  2. **Sources:** Every website scraped by that bot with clickable URLs, domain, word count, crawl depth, and snippet preview.
-  3. **Output:** The bot's compiled findings — plus full **Apollo Mission Report** viewer with **Copy Markdown** and **Download `.md`**.
-- **Deploy Sub-Bot Inline:** Click `+ Sub-Bot` on any node in Local Engine mode to summon an extra live Olympian under that specific bot with a custom follow-up directive.
-- **Built-in Demo Mode:** Toggle between **Local Engine / Netlify Cloud** and **Demo** anytime to preview the Greek mythology swarm without an API key.
 
 ---
 
@@ -113,11 +117,10 @@ npm run dev
 ```
 
 1. Open `http://localhost:5173`.
-2. Click **Settings** (top-right) to select **Gemini**, **OpenAI**, or **Anthropic** and paste your API key (skipped automatically if detected from `.env`).
-3. Pick a starter template or enter any goal, choose **Ask First** or **Auto-Assume**, select **Quick / Deep / Abyssal**, and click **Deploy Pantheon**.
+2. Click the **Settings** gear icon (top-right) to select **Gemini**, **OpenAI**, or **Anthropic** and paste your API key (skipped automatically if detected from `.env`).
+3. Pick a starter template or enter any goal, choose **Ask first** or **Auto-assume**, select **Quick / Deep / Abyssal**, and click **Deploy**.
 
 ### Option B — Deploy Cloud Mode on Netlify
-Pantheon v2 ships ready for Netlify Functions:
 1. Connect your GitHub repo to Netlify and deploy the **`v2`** branch (`netlify.toml` builds `dist/` and bundles `netlify/functions/pantheon.mts` at `/api/cloud/*`).
 2. Optionally set `GEMINI_API_KEY`, `OPENAI_API_KEY`, or `ANTHROPIC_API_KEY` in Netlify Site Environment Variables (scoped to **Functions**), or let visitors bring their own key via the UI **Settings** modal.
 3. Cloud missions stream live via SSE (`ReadableStream`) within Netlify's 60-second streaming window, with mission history saved locally in the browser.
@@ -149,7 +152,7 @@ Builds `release/Bot Mind Map.app`.
 
 | Runtime | Endpoint | Description |
 | :--- | :--- | :--- |
-| Local | `GET /api/health` | Engine runtime info & detected `.env` providers |
+| Local | `GET /api/health` | Engine runtime info (`v2.2.1`) & detected `.env` providers |
 | Local | `GET /api/missions` | List persisted mission history |
 | Local | `POST /api/missions` | Create mission & run Zeus context analysis (+ auto-execution) |
 | Local | `GET /api/missions/:id/stream` | Real-time SSE telemetry stream |
@@ -162,28 +165,35 @@ Builds `release/Bot Mind Map.app`.
 
 ---
 
-## Project Structure (`v2`)
+## Project Structure (`v2.2.1`)
 
 ```text
 pantheon/
 ├── engine/                           # Shared runtime-agnostic multi-agent core
 │   ├── types.ts                      # Canonical Mission, Bot, Source & SSE types
 │   ├── pantheonRoster.ts             # Greek mythology deities, personas & depth presets
-│   ├── llmClient.ts                  # Unified Gemini / OpenAI / Anthropic tool-calling client
+│   ├── llmClient.ts                  # Unified Gemini 3.8 / OpenAI / Anthropic client
 │   ├── webTools.ts                   # Ad-filtered web search, HTML scraper & deep crawler
 │   ├── agentRunner.ts                # ReAct loop + parallel sub-agent spawning
 │   └── missionOrchestrator.ts        # Zeus Context Analyzer -> Parallel Swarm -> Apollo Report
 ├── server/
-│   └── index.ts                      # Local Mac Node.js HTTP + SSE engine (:8787)
+│   └── index.ts                      # Local Node.js HTTP + SSE engine (:8787)
 ├── netlify/functions/
 │   └── pantheon.mts                  # Netlify Cloud Function (/api/cloud/*) with SSE streaming
 ├── src/
-│   ├── hooks/usePantheon.ts          # Unified Local Engine + Netlify Cloud + Demo state manager
+│   ├── index.css                     # Graphite dark & light role tokens + shared controls
+│   ├── hooks/
+│   │   ├── usePantheon.ts            # Unified Local Engine + Netlify Cloud + Demo state manager
+│   │   ├── useTheme.ts               # Dark/light theme hook synced with <html data-theme>
+│   │   └── useNow.ts                 # 1-second clock for live elapsed & relative durations
+│   ├── utils/                        # treeLayout, format, keyboard, mcpAppBridge
 │   ├── engine/mockOrchestrator.ts    # Greek mythology offline Demo simulator
 │   └── components/
-│       ├── graph/                    # BotGraphCanvas, BotNode (Greek deity cards), BotEdge
-│       ├── header/                   # HeaderToolbar (runtime switcher, stats, controls)
-│       ├── inspector/                # 3-tab Logs/Sources/Output Inspector + Sub-Bot deployer
+│       ├── common/                   # StatusIcon (5 shape-coded accessible glyphs)
+│       ├── sidebar/                  # AgentSidebar (filterable Olympian tree + saved missions)
+│       ├── graph/                    # BotGraphCanvas (420ms animation), BotNode, BotEdge, MapToolbar
+│       ├── details/                  # Resizable bottom DetailsDrawer (Activity · Sources · Output)
+│       ├── header/                   # HeaderToolbar (runtime switcher, theme, status, actions)
 │       ├── mission/                  # MissionLauncher, ClarificationModal, MissionReportModal
 │       └── settings/                 # Multi-provider AI & Search key configuration modal
 ├── desktop/                          # Native macOS Swift + WKWebView wrapper

@@ -1,9 +1,9 @@
 import type { BotEntity } from '../types/bot';
 
-export const NODE_WIDTH = 280;
-export const NODE_HEIGHT = 148;
-export const H_GAP = 48;
-export const V_GAP = 88;
+export const NODE_WIDTH = 208;
+export const NODE_HEIGHT = 56;
+export const H_GAP = 24;
+export const V_GAP = 46;
 
 export interface TreePoint {
   x: number;
@@ -117,6 +117,7 @@ export function computeTreeLayout(
 
   assignPositions(rootId, -rootWidth / 2, 0);
 
+  // Fallback placement for any disconnected nodes not reachable from rootId
   let orphanX = rootWidth / 2 + H_GAP;
   for (const botId of Object.keys(bots)) {
     if (!positions[botId]) {

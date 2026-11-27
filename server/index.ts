@@ -197,7 +197,7 @@ const server = http.createServer(async (req, res) => {
     if (method === 'GET' && pathname === '/api/health') {
       const caps: ServerCapabilities = {
         runtime: 'local',
-        version: '2.0.0',
+        version: '2.2.1',
         configuredProviders: {
           gemini: Boolean(process.env.GEMINI_API_KEY?.trim()),
           openai: Boolean(process.env.OPENAI_API_KEY?.trim()),

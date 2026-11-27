@@ -1,23 +1,80 @@
-:root {
-  --bg-canvas: #0b0f17;
-  --bg-surface: #111827;
-  --bg-elevated: #1a2234;
-  --border-subtle: #253047;
-  --border-active: #38bdf8;
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --status-running: #22d3ee;
-  --status-waiting: #a78bfa;
-  --status-idle: #f59e0b;
-  --status-done: #10b981;
-  --status-error: #f87171;
-  --accent-indigo: #818cf8;
-  --accent-gold: #fbbf24;
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+/* ── Theme tokens ─────────────────────────────────────────────
+   Every colour is a role. The theme switch only remaps roles. */
+:root,
+[data-theme='dark'] {
+  --bg: #050506;
+  --base: #0a0a0b;
+  --raised: #111113;
+  --hover: #17171a;
+  --active: #1e1e22;
+  --line: #1c1c1f;
+  --line-2: #2a2a2e;
+  --line-3: #3a3a40;
+  --text: #ededef;
+  --text-2: #a1a1a6;
+  --text-3: #86868d;
+  --on-primary: #0a0a0b;
+  --primary-hover: #ffffff;
+  --run: #3ea8ff;
+  --run-bg: rgba(62, 168, 255, 0.12);
+  --wait: #a78bfa;
+  --wait-bg: rgba(167, 139, 250, 0.12);
+  --idle: #f0a531;
+  --done: #6e6e76;
+  --ok: #3fcf8e;
+  --ok-bg: rgba(63, 207, 142, 0.12);
+  --warn-bg: #17130c;
+  --warn-text: #f5d49a;
+  --err: #f87171;
+  --err-bg: rgba(248, 113, 113, 0.12);
+  --err-text: #fca5a5;
+  --backdrop: rgba(0, 0, 0, 0.68);
+  --grid: #1a1a1d;
+  --node-shadow: none;
+  --pop-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.8);
+  --selection: rgba(62, 168, 255, 0.35);
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  color-scheme: dark;
 }
 
+[data-theme='light'] {
+  --bg: #f7f7f8;
+  --base: #ffffff;
+  --raised: #ffffff;
+  --hover: #f4f4f6;
+  --active: #eaeaed;
+  --line: #ececef;
+  --line-2: #dcdce1;
+  --line-3: #c6c6cd;
+  --text: #111113;
+  --text-2: #55555c;
+  --text-3: #66666e;
+  --on-primary: #ffffff;
+  --primary-hover: #2a2a2e;
+  --run: #0a6fcc;
+  --run-bg: #eff6ff;
+  --wait: #6d28d9;
+  --wait-bg: #f3e8ff;
+  --idle: #a35f00;
+  --done: #9a9aa2;
+  --ok: #13804b;
+  --ok-bg: #ecfdf5;
+  --warn-bg: #fff7eb;
+  --warn-text: #7a4500;
+  --err: #dc2626;
+  --err-bg: #fef2f2;
+  --err-text: #991b1b;
+  --backdrop: rgba(17, 17, 19, 0.35);
+  --grid: #dedee3;
+  --node-shadow: 0 1px 2px rgba(17, 17, 19, 0.05);
+  --pop-shadow: 0 8px 24px -10px rgba(17, 17, 19, 0.18);
+  --selection: rgba(10, 111, 204, 0.2);
+  color-scheme: light;
+}
+
+/* ── Base ─────────────────────────────────────────────────── */
 *,
 *::before,
 *::after {
@@ -31,79 +88,364 @@ body,
   width: 100%;
   margin: 0;
   padding: 0;
-  background-color: var(--bg-canvas);
-  color: var(--text-primary);
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
   font-family: var(--font-sans);
+  font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
+}
+
+::selection {
+  background: var(--selection);
 }
 
 button,
 input,
-textarea,
-select {
-  font-family: inherit;
+select,
+textarea {
+  font: inherit;
+  color: inherit;
 }
 
-/* Custom dark scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+  border-radius: 6px;
 }
 
-::-webkit-scrollbar-track {
+/* Scrollbars stay out of the way until you point at a panel. */
+.scroll-quiet {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.scroll-quiet:hover {
+  scrollbar-color: var(--line-2) transparent;
+}
+
+.scroll-quiet::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.scroll-quiet::-webkit-scrollbar-track {
   background: transparent;
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--border-subtle);
-  border-radius: 999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #3b4b6b;
-}
-
-/* React Flow dark theme overrides */
-.react-flow {
-  background-color: var(--bg-canvas);
-}
-
-.react-flow__controls {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+.scroll-quiet::-webkit-scrollbar-thumb {
+  background: transparent;
   border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border: 3px solid transparent;
+  background-clip: padding-box;
 }
 
-.react-flow__controls-button {
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
-  fill: currentColor;
-  width: 30px;
+.scroll-quiet:hover::-webkit-scrollbar-thumb {
+  background-color: var(--line-2);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ── Shared controls ──────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   height: 30px;
+  padding: 0 11px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s var(--ease),
+    border-color 0.15s var(--ease),
+    color 0.15s var(--ease);
 }
 
-.react-flow__controls-button:hover {
-  background: var(--bg-elevated);
-  color: var(--text-primary);
+.btn svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
 }
 
-.react-flow__controls-button:last-child {
-  border-bottom: none;
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
 }
 
-.react-flow__minimap {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: 10px;
+.btn-primary {
+  background: var(--text);
+  color: var(--on-primary);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.btn-primary:disabled {
+  background: var(--active);
+  color: var(--text-3);
+  opacity: 1;
+}
+
+.btn-secondary {
+  background: var(--raised);
+  border-color: var(--line-2);
+  color: var(--text);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--hover);
+  border-color: var(--line-3);
+}
+
+.btn-ghost {
+  color: var(--text-2);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.btn-danger {
+  color: var(--err);
+  background: var(--err-bg);
+  border-color: transparent;
+}
+
+.btn-danger:hover:not(:disabled) {
+  border-color: var(--err);
+}
+
+.btn-icon {
+  width: 30px;
+  padding: 0;
+}
+
+.divider-v {
+  width: 1px;
+  height: 18px;
+  background: var(--line-2);
+  flex-shrink: 0;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  transition: border-color 0.15s var(--ease);
+}
+
+.field:focus-within {
+  border-color: var(--line-3);
+}
+
+.field svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--text-3);
+}
+
+.field input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.field input::placeholder {
+  color: var(--text-3);
+}
+
+/* ── Shared Modal Backdrop & Close Button ─────────────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: var(--backdrop);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* ── Agent row (sidebar list, drawer lineage) ─────────────── */
+.tree-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 30px;
+  padding-right: 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  text-align: left;
+  font-size: 13px;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: background-color 0.12s var(--ease);
+}
+
+.tree-row:hover {
+  background: var(--hover);
+}
+
+.tree-row.is-selected {
+  background: var(--active);
+}
+
+.tree-row__guide {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line-2);
+}
+
+.tree-row__name {
+  color: var(--text);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.tree-row__role {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-3);
+  white-space: nowrap;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  text-overflow: ellipsis;
+}
+
+.tree-row__pages {
+  font-size: 11px;
+  color: var(--run);
+  white-space: nowrap;
+}
+
+.tree-row__count {
+  font-size: 11px;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+/* ── Status icon ──────────────────────────────────────────── */
+.status-icon {
+  display: block;
+  flex-shrink: 0;
+}
+
+.status-icon--running {
+  color: var(--run);
+}
+
+.status-icon--waiting {
+  color: var(--wait);
+}
+
+.status-icon--idle {
+  color: var(--idle);
+}
+
+.status-icon--done {
+  color: var(--done);
+}
+
+.status-icon--error {
+  color: var(--err);
+}
+
+.status-icon__check,
+.status-icon__cross {
+  fill: none;
+  stroke: var(--base);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.status-icon__arc {
+  transform-origin: 7px 7px;
+  animation: status-spin 1.4s linear infinite;
+}
+
+.status-icon__pulse {
+  transform-origin: 7px 7px;
+  animation: status-pulse 1.6s ease-in-out infinite;
+}
+
+.is-paused .status-icon__arc,
+.is-paused .status-icon__pulse {
+  animation-play-state: paused;
+}
+
+@keyframes status-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes status-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.spin {
+  animation: status-spin 1s linear infinite;
+}
+
+/* ── React Flow ───────────────────────────────────────────── */
+.react-flow {
+  --xy-background-color: var(--bg);
+  background-color: var(--bg);
 }
 
 .react-flow__attribution {
   display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }

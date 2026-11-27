@@ -38,12 +38,14 @@ const DEFAULT_SETTINGS: PantheonSettings = {
   defaultDepth: 'deep',
 };
 
+const DEPRECATED_GEMINI_MODELS = new Set(['gemini-2.5-flash', 'gemini-2.0-flash']);
+
 function loadSettings(): PantheonSettings {
   try {
     const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
     if (!raw) return DEFAULT_SETTINGS;
     const parsed = JSON.parse(raw) as Partial<PantheonSettings>;
-    return {
+    const merged: PantheonSettings = {
       ...DEFAULT_SETTINGS,
       ...parsed,
       apiKeys: {
@@ -51,6 +53,11 @@ function loadSettings(): PantheonSettings {
         ...(parsed.apiKeys ?? {}),
       },
     };
+    if (merged.provider === 'gemini' && DEPRECATED_GEMINI_MODELS.has(merged.model)) {
+      merged.model = DEFAULT_MODELS.gemini;
+      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(merged));
+    }
+    return merged;
   } catch {
     return DEFAULT_SETTINGS;
   }
